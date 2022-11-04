@@ -1,0 +1,223 @@
+* {
+    padding: 0px;
+    margin: 0px;
+}
+
+body {
+    background-color: #f7f9fb;
+    font-family: 'Roboto', sans-serif !important;
+}
+.nav-pills .nav-link.active {
+    background-color: #10a1ec;
+}
+
+.content {
+    margin-top: 3%;
+    -webkit-box-shadow: -1px 13px 17px 0px rgba(0, 0, 0, 0.09);
+    -moz-box-shadow: -1px 13px 17px 0px rgba(0, 0, 0, 0.09);
+    box-shadow: -1px 13px 17px 0px rgba(0, 0, 0, 0.09);
+    background: #fff;
+}
+
+.content1 ul li {
+    list-style: none;
+    font-family: 'Roboto', sans-serif;
+    color: rgb(128, 128, 128);
+    margin-top: 15px;
+    font-size: 13px;
+}
+
+.content1 .content-head {
+    margin: auto;
+    text-align: center;
+}
+
+.content1 .content-head p {
+    margin-bottom: 0px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    color: rgb(128, 128, 128);
+}
+
+.content1 .content-head h1 {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+}
+
+.wrapper {
+    /* border-color: transparent;
+    box-shadow: 0 4px 8px rgb(0 0 0 / 5%); */
+    padding: 30px 30px;
+    /* border-radius: 10px; */
+    background-color: #fff;
+}
+
+.content ul li {
+    list-style: none;
+    font-family: 'Roboto', sans-serif;
+    color: rgb(128, 128, 128);
+    margin-top: 15px;
+    font-size: 15px;
+    width: 49%;
+    text-align: center;
+    margin: auto;
+}
+
+li.dha>a, li.hjc>a {
+    color: black;
+}
+
+.content .content-head {
+    margin: auto;
+    text-align: center;
+}
+
+.content .content-head p {
+    margin-bottom: 0px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    color: rgb(128, 128, 128);
+}
+
+.content .content-head h1 {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+}
+
+.form-div {
+    margin-top: 50px;
+    font-family: 'Roboto', sans-serif;
+}
+
+.form-div label {
+    margin-bottom: 0px;
+    font-size: 15px;
+}
+
+.form-div .form-control {
+    padding: 0.6rem 0.75rem;
+    color: rgb(0, 0, 0);
+    font-size: 14px;
+    border: none;
+    border-bottom: 1px solid;
+    border-radius: 0px;
+}
+
+.form-div .form-control:focus {
+    border-color: #d4d9df;
+    box-shadow: 0 0 0 0rem rgb(0 123 255 / 25%);
+}
+
+.form-div small {
+    text-align: right;
+    padding-top: 5px;
+    color: #6c757d;
+}
+
+.form-div small a {
+    color: rgb(0, 0, 0);
+    text-decoration: underline;
+}
+
+.btn-sign {
+    border: 0px;
+    background-color: #10a1ec;
+    color: #fff;
+}
+
+.btn-sign:focus {
+    box-shadow: 0 0 0 0rem #10a1ec;
+}
+
+.form-div .btn-sign {
+    border: 0px;
+    padding: 8px 50px;
+    background-color: #10a1ec;
+    color: #fff;
+}
+
+.form-div .btn-sign:focus {
+    box-shadow: 0 0 0 0rem #10a1ec;
+}
+
+.form-div .btn-sign-2 {
+    border: 0px;
+    background-color: #10a1ec;
+    color: #fff;
+    text-align: center;
+    padding: 9px 9px;
+}
+
+.form-div .btn-sign-2:focus {
+    box-shadow: 0 0 0 0rem #10a1ec;
+}
+
+.footer {
+    text-align: center;
+    margin-top: 100px;
+}
+
+.footer ul {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    /* For IE, the outcast */
+    zoom: 1;
+    *display: inline;
+}
+
+.footer li {
+    float: left;
+    padding: 2px 12px;
+    /* font-size: 14px !important; */
+}
+
+.footer li a {
+    text-decoration: underline;
+    color: black;
+}
+
+@media only screen and (min-width: 250px) and (max-width: 670px) {
+    .content {
+        min-width: 100%;
+        width: 100%;
+        margin-top: 13%;
+    }
+
+    .wrapper {
+        border-color: transparent;
+        box-shadow: 0 0px 0px rgb(0 0 0 / 5%);
+        padding: 10px 20px;
+        border-radius: 10px;
+        background-color: transparent;
+    }
+
+    .dha {
+        float: none;
+        text-align: center;
+    }
+
+    .hjc {
+        float: none;
+        text-align: center;
+    }
+
+    .footer {
+        margin-top: 20px;
+    }
+
+    .cstm-row {
+        padding: 0px 15px;
+    }
+
+    .cstm-row>.col-md-6:nth-child(1) {
+        padding: 0px;
+        margin-bottom: 2px;
+    }
+
+    .cstm-row>.col-md-6:nth-child(2) {
+        padding: 0px;
+        margin-top: 2px;
+    }
+}
+
