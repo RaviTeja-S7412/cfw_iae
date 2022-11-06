@@ -10,7 +10,7 @@
               class="img-fluid"
             />
           </div>
-          <div class="col-md-5 contents offset-1 mt-5">
+          <div class="col-md-5 contents offset-1">
             <div class="row justify-content-center">
               <div class="col-md-12">
                 <div class="mb-4">

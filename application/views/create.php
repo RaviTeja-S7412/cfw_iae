@@ -71,6 +71,9 @@
 					<div class="col-lg-12" align="right">
 						
 					</div>
+					<div class="col-md-12">
+						<p style="margin-left: 125px;color: red;font-size: 14px;font-weight: 500;">Note: Minor variation is allowed as per the need of the respective discipline.</p>	
+					</div>
 					<div class="col-lg-12 subcategories_weightages">
 						
 					</div>
@@ -121,7 +124,7 @@
       <div class="modal-body">
 		<form method="post" id="addnew_course_category">
 			<div class="form-group">
-				<input type="text" class="form-control" name="new_course_category" placeholder="Add New Course Category" required>
+				<input type="text" class="form-control" name="new_course_category" id="new_course_category" placeholder="Add New Course Category" required>
 			</div>
 			<div class="form-group">
 				<input type="submit" class="btn btn-primary pull-left" value="Submit">
@@ -152,7 +155,7 @@
 			success: function(data){
 				$("#branchModal").modal('hide');
 				if(data.status == "success"){
-
+					getBranches(data.branch_id)
 				}
 			},
 			error: function(data){
@@ -162,19 +165,28 @@
 
 	})
 
-	$("#addnew_course_category").submit(function(){
+	$("#addnew_course_category").submit(function(e){
 		
-		var branch = "";
-		var branch_status = "";
-		if($("#branches").val() == "new"){
-			branch = $("#new_branch_name").val();
-			branch_status = "new";
-		}else{
-			branch = $("#branches").val();
-			branch_status = "old";
-		}
+		e.preventDefault();
+		var branch = $("#branches").val();
+		var course = $("#courses").val();
+		var course_category = $("#new_course_category").val();
 
+		$.ajax({
+			type: "post",
+			data: {course_category: course_category, branch: branch},
+			dataType: "json",
+			url: "<? echo base_url('ajax/addNewcoursecategory') ?>",
+			success: function(data){
+				$("#myModal").modal('hide');
+				if(data.status == "success"){
+					getSubcategories(branch, course)
+				}
+			},
+			error: function(data){
 
+			}
+		})
 
 	})
 
@@ -269,7 +281,7 @@
 		
 	}
 
-	function getBranches(){
+	function getBranches(branch_id=""){
 		
 		var id = 0;
 		<? if($branch_data->course != ""){ ?>
@@ -278,13 +290,19 @@
 			id = $("#courses").val();
 		<? } ?>	
 
+		var bid = "";
+		if(branch_id){
+			bid = branch_id;
+		}else{
+			bid = <? echo ($branch_data->branch_name != "") ? $branch_data->branch_name : 0 ?>;
+		}
+
 		$.ajax({
 			type: "post",
-			data: {id:id,cid:<? echo ($branch_data->branch_name != "") ? $branch_data->branch_name : 0 ?>},
+			data: {id:id,cid:bid},
 			url: "<? echo base_url('ajax/getBranches') ?>",
 			success: function(data){
 				$("#branches").html(data);
-				getBranches();
 			}
 		})
 		
@@ -338,6 +356,7 @@
 		$(".new_course_category").show();
 
 		if(id == "new"){
+			$("#new_branch_name").val("");
 			$("#branchModal").modal('show');
 		}else{
 			$("#branchModal").modal('hide');
@@ -427,7 +446,13 @@
 
 		  }
 		var courses = $("#courses").val();
-		var branch = $("#branches").val();
+
+		<? if($branch_data->branch_name != ""){ ?>
+			var branch = "<? echo $branch_data->branch_name ?>";
+		<? }else{ ?>	
+			var branch = $("#branches").val();
+		<? } ?>	
+
 		$.ajax({
 			type : "post",
 			data : {sub_cats:sub_cats,weightages:<? echo ($branch_data->weightage != "") ? $branch_data->weightage : "[]" ?>,cid:courses,branch:branch},

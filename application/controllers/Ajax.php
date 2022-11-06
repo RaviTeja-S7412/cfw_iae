@@ -160,9 +160,53 @@ class Ajax extends CI_Controller {
 
 			$cbl = $this->db->insert("tbl_course_branch_links",["branch"=>$lid,"course"=>$course]);
 			if($cbl){
+				echo json_encode(["status"=>"success", "branch_id"=>$lid]);
+			}else{
+				echo json_encode(["status"=>"error"]);
+			}
+
+		}else{
+			echo json_encode(["status"=>"error"]);
+		}
+
+	}
+
+	public function addNewcoursecategory(){
+
+		$course_category = $this->input->post("course_category");
+		$branch = $this->input->post("branch");
+
+		$cb = $this->db->insert("tbl_subject_category",["category_name"=>$course_category,"status"=>1,"deleted"=>0]);
+		$lid = $this->db->insert_id();
+		if($cb){
+
+			$cbl = $this->db->insert("tbl_subcat_course_links",["course"=>$branch,"subject_category"=>$lid]);
+			if($cbl){
 				echo json_encode(["status"=>"success"]);
 			}else{
 				echo json_encode(["status"=>"error"]);
+			}
+
+		}else{
+			echo json_encode(["status"=>"error"]);
+		}
+
+	}
+
+	public function addNewsubject(){
+
+		$course_category = $this->input->post("course_category");
+		$subject = $this->input->post("new_subject");
+		$ideal_credits = $this->input->post("ideal_credits");
+		$bid = $this->input->post("bid");
+
+		$cb = $this->db->insert("tbl_subjects",["subject_name"=>$subject,"ideal_credits"=>$ideal_credits,"elective_status"=>"all","status"=>1,"deleted"=>0]);
+		$lid = $this->db->insert_id();
+		if($cb){
+
+			$cbl = $this->db->insert("tbl_sub_subcat_links",["subject_category"=>$course_category,"subject"=>$lid]);
+			if($cbl){
+				redirect('create-design/add-subjects?bid='.$bid);
 			}
 
 		}else{

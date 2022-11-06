@@ -17,7 +17,7 @@ $ref = $this->input->get("ref");
 
     <div class="content1" id="content1">
       <div class="container">
-       	<h4>CURRICULUM DESIGN - <? echo $branch_data->branch_name." (".$program->program_name." - ".$course->course_name.")" ?></h4>
+       	<h4>(<? echo $program->program_name." - ".$course->course_name." - ".$this->db->get_where("tbl_branches",["id"=>$branch_data->branch_name])->row()->branch_name ?>)</h4>
         <div class="col-lg-12 card-col">
         	<div class="row mb-3">
 				<div class="col-lg-6">

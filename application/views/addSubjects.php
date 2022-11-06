@@ -5,12 +5,15 @@
 	.col-form-label {
 		text-align: right;
 	}
+	.bootstrap-duallistbox-container select{
+		height: 180px !important;
+	}
 
 </style>
 
 	<div class="content1">
       <div class="container">
-        <h4><? echo ($this->input->get("bid") != "") ? 'Update' : 'Add'; ?>  Subjects To Subject Categories</h4>
+        <h4>Select Subjects</h4>
        <!-- <form method="post" id="addSubjects" action="#<? //echo base_url("dashboard/insertSubjects") ?>"> -->
         <form method="post" id="addSubjects">
 			<div class="col-lg-12 card-col">
@@ -44,6 +47,11 @@
 							}
 						?>			
 						</select>
+					<div class="row" style="margin-top:10px; margin-bottom:10px">
+						<div class="col-md-12">
+							<input type="button" class="btn btn-info pull-left new_subjects" course_category="<? echo $sc ?>" value="Add New Subjects">
+						</div>
+					</div>
 					<div class="row">
 						<div class="form-group col-md-6">
 							<label>Electives</label>
@@ -100,7 +108,45 @@
     </div>
 <? $this->load->view( "front_common/footer" ) ?>
 
+<div id="myModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header" style="display:block">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Add New Subject</h4>
+      </div>
+      <div class="modal-body">
+		<form method="post" action="<? echo base_url('ajax/addNewsubject') ?>">
+			<div class="form-group">
+				<input type="text" class="form-control" name="new_subject" placeholder="Add New Subject" required>
+				<input type="hidden" class="form-control" name="course_category" id="course_category" required>
+				<input type="hidden" class="form-control" name="bid" value="<? echo $this->input->get('bid') ?>"  required>
+			</div>
+			<div class="form-group">
+				<input type="text" class="form-control" name="ideal_credits" placeholder="Ideal Credits" required>
+			</div>
+			<div class="form-group">
+				<input type="submit" class="btn btn-primary pull-left" value="Submit">
+			</div>
+		</form>	
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
 <script type="text/javascript">
+
+	$(".new_subjects").click(function(){
+
+		var course_category = $(this).attr("course_category");
+		$("#myModal").modal("show");
+		$("#course_category").val(course_category);
+
+	})
 	
 	$(".electives").change(function(){
 		

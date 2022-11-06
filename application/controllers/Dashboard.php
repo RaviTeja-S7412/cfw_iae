@@ -261,8 +261,9 @@ class Dashboard extends CI_Controller {
 		
 		if($d){
 			
+			$branch_name = $this->db->get_where("tbl_branches",["id"=>$bd->branch_name])->row()->branch_name;
 			$this->db->where("id",$bid)->update("tbl_institute_branches",["status"=>1]);
-			echo json_encode(["status"=>true,"msg"=>"Credits Added Successfully, Curriculum Design Successfully Created For $bd->branch_name."]);
+			echo json_encode(["status"=>true,"msg"=>"Credits Added Successfully, Curriculum Design Successfully Created For $branch_name."]);
 			
 			$this->session->unset_userdata("branch_data");
 			exit();
@@ -390,7 +391,7 @@ class Dashboard extends CI_Controller {
 				if($bid){
 					echo json_encode(["status"=>true,"msg"=>"Updated Successfully.","bid"=>$bid]);
 				}else{
-					echo json_encode(["status"=>true,"msg"=>"Branch Created Successfully Please Add Subjects.","bid"=>$lid]);
+					echo json_encode(["status"=>true,"msg"=>"Course Created Successfully Please Add Subjects.","bid"=>$lid]);
 				}
 			
 			}else{
