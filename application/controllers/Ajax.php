@@ -37,6 +37,7 @@ class Ajax extends CI_Controller {
 		
 		$id = $this->input->post("id");
 		$cid = $this->input->post("cid");
+		$institution_id = $this->session->userdata('institute_id');
 		
 		$this->db->select("tbl_courses.*");
 		$this->db->join("tbl_courses","tbl_program_course_links.course=tbl_courses.id");
@@ -44,8 +45,19 @@ class Ajax extends CI_Controller {
 		
 		$html = '<option value="">Select Course</option>';
 		foreach($data as $d){
+
+			$icChk = $this->db->get_where("tbl_institution_course_credits",["course_id"=>$d->id, "institution_id"=>$institution_id]);
+
+			$min = $d->min_credits;
+			$max = $d->max_credits;
+			if($icChk->num_rows() > 0){
+				$icdata = $icChk->row();
+				$min = $icdata->min_credits;
+				$max = $icdata->max_credits;
+			}
+
 			$sel = ($cid == $d->id) ? 'selected' : '';	
-			$html .= '<option value="'.$d->id.'" coname="'.$d->course_short_code.'" '.$sel.'>'.$d->course_name.'</option>';
+			$html .= '<option value="'.$d->id.'" cmin="'.$min.'" cmax="'.$max.'" coname="'.$d->course_short_code.'" '.$sel.'>'.$d->course_name.'</option>';
 			
 		}
 		
@@ -58,8 +70,18 @@ class Ajax extends CI_Controller {
 		$cid = $this->input->post("cid");
 		$id = $this->input->post("id");
 		$sub_ids = $this->input->post("sub_ids");
-		
+		$institution_id = $this->session->userdata('institute_id');
+
 		$cdata = $this->db->get_where("tbl_courses",["id"=>$cid])->row();
+		$icChk = $this->db->get_where("tbl_institution_course_credits",["course_id"=>$cid, "institution_id"=>$institution_id]);
+
+		$min = $cdata->min_credits;
+		$max = $cdata->max_credits;
+		if($icChk->num_rows() > 0){
+			$icdata = $icChk->row();
+			$min = $icdata->min_credits;
+			$max = $icdata->max_credits;
+		}
 		
 		$this->db->select("tbl_subject_category.category_name,tbl_subject_category.id");
 		$this->db->join("tbl_subject_category","tbl_subcat_course_links.subject_category=tbl_subject_category.id");
@@ -78,7 +100,7 @@ class Ajax extends CI_Controller {
 			
 		}
 		
-		echo json_encode(["subcategories"=>$subcategories,"credits"=>"($cdata->min_credits - $cdata->max_credits)"]);
+		echo json_encode(["subcategories"=>$subcategories,"credits"=>"($min - $max)"]);
 		
 	}
 	
@@ -211,6 +233,30 @@ class Ajax extends CI_Controller {
 
 		}else{
 			echo json_encode(["status"=>"error"]);
+		}
+
+	}
+
+	public function updateinstCredits(){
+
+		$course_id = $this->input->post("course_id");
+		$institution_id = $this->session->userdata('institute_id');
+		$min_credits = $this->input->post("min_credits");
+		$max_credits = $this->input->post("max_credits");
+
+		$data = [
+			"course_id" => $course_id,
+			"institution_id" => $institution_id,
+			"min_credits" => $min_credits,
+			"max_credits" => $max_credits
+		];
+
+		$cChk = $this->db->get_where("tbl_institution_course_credits",["course_id"=>$course_id,"institution_id"=>$institution_id])->num_rows();
+
+		if($cChk > 0){
+			$this->db->where(["course_id"=>$course_id,"institution_id"=>$institution_id])->update("tbl_institution_course_credits",$data);
+		}else{
+			$this->db->insert("tbl_institution_course_credits", $data);
 		}
 
 	}

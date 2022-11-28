@@ -1,6 +1,17 @@
 <? 
 	$this->load->view("front_common/header"); 
-	$ref = $this->input->get("ref");		
+	$ref = $this->input->get("ref");
+	$institution_id = $this->session->userdata('institute_id');
+	
+	$icChk = $this->db->get_where("tbl_institution_course_credits",["course_id"=>$branch_data->course, "institution_id"=>$institution_id]);
+
+	$min_credits = $branch_data->min_credits;
+	$max_credits = $branch_data->max_credits;
+	if($icChk->num_rows() > 0){
+		$icdata = $icChk->row();
+		$min_credits = $icdata->min_credits;
+		$max_credits = $icdata->max_credits;
+	}
 ?>
 
 <style>
@@ -23,10 +34,10 @@
          
           <div class="col-lg-6 ml-auto d-flex">
             <p class="mb-0 text-dark p-1 text-left">
-              <b style="font-weight: 700">Min Credits:</b> <b><? echo $branch_data->min_credits ?></b>
+              <b style="font-weight: 700">Min Credits:</b> <b><? echo $min_credits ?></b>
             </p>
             <p class="mb-0 text-dark p-1 ml-auto">
-              <b style="font-weight: 700">Max Credits:</b> <b><? echo $branch_data->max_credits ?></b>
+              <b style="font-weight: 700">Max Credits:</b> <b><? echo $max_credits ?></b>
             </p>
             <p class="mb-0 text-dark p-1 ml-auto">
               <b style="font-weight: 700">Total Credits:</b> <b class="totalCredits"><? echo $totalCredits ?></b>

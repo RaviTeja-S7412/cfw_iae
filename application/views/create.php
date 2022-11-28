@@ -36,6 +36,11 @@
 							<option value="">Course</option>
 						</select>
 					</div>
+					<div class="col-lg-9 cnote" style="margin-top: 20px; display: none">
+						<p style="font-size: 12px; color: red; font-weight: 500">Note: Typical credits are: Minimum – <span id="cmin"></span>, Maximum – <span id="cmax"></span><br>
+						<!-- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Institution credits are: Minimum – <span id="cmin"></span>, Maximum – <span id="cmax"></span> -->
+						</p></div>
+					<div class="col-lg-3 cnote" style="margin-top: 20px; display: none"><a class="btn btn-primary btn-sm pull-right" href="#" data-toggle="modal" data-target="#creditsModal">Define Your Own Credits</a></div>
 					<div class="col-lg-12">
 						<br>
 						<div class="form-group">
@@ -87,6 +92,33 @@
 	</div>
 </div>
 <input type="hidden" class="weightagelabel">
+
+<div id="creditsModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header" style="display:block">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Update Credits</h4>
+      </div>
+      <div class="modal-body">
+		<form method="post" id="updateCredits">
+			<div class="form-group">
+				<input type="number" class="form-control" name="min_credits" id="min_credits" placeholder="Minimum Credits" required>
+			</div>
+			<div class="form-group">
+				<input type="number" class="form-control" name="max_credits" id="max_credits" placeholder="Maximum Credits" required>
+			</div>
+			<div class="form-group">
+				<input type="submit" class="btn btn-primary pull-left" value="Submit">
+			</div>
+		</form>	
+      </div>
+    </div>
+
+  </div>
+</div>
 
 <div id="branchModal" class="modal fade" role="dialog">
   <div class="modal-dialog">
@@ -140,6 +172,34 @@
 
 
 <script type="text/javascript">
+
+	$("#updateCredits").submit(function(e){
+		
+		e.preventDefault();
+		var course_id = $("#courses").val();
+		var min_credits = $("#min_credits").val();
+		var max_credits = $("#max_credits").val();
+
+		$.ajax({
+			type: "post",
+			data: {course_id: course_id, min_credits: min_credits, max_credits: max_credits},
+			url: "<? echo base_url('ajax/updateinstCredits') ?>",
+			success: function(data){
+				swal(
+					'',
+					'Credits Updated Successfully',
+					'success'
+				);
+				setTimeout(() => {
+					location.reload();
+				}, 2000);
+			},
+			error: function(data){
+
+			}
+		})
+
+	})
 
 	$("#addnew_branch").submit(function(e){
 		
@@ -342,6 +402,19 @@
 	$("#courses").change(function(){
 		
 		getBranches();
+		var min = $('option:selected', this).attr('cmin');
+		var max = $('option:selected', this).attr('cmax');
+
+		if($(this).val() == ""){
+			$(".cnote").hide();
+			$("#cmin").html("");
+			$("#cmax").html("");
+		}else{
+			$(".cnote").show();
+			$("#cmin").html(min);
+			$("#cmax").html(max);
+		}
+		
 		$('#sub_cats').bootstrapDualListbox('refresh', true);
 		
 	})

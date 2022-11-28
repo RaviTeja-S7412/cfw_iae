@@ -13,9 +13,18 @@ class Admin extends CI_Model{
 	
 	public function getCreditweightage($weightage,$cid){
 		
+		$institution_id = $this->session->userdata('institute_id');
 		$cdata = $this->db->get_where("tbl_courses",["id"=>$cid])->row();
-		$min_credits = $cdata->min_credits; 
+
+		$icChk = $this->db->get_where("tbl_institution_course_credits",["course_id"=>$cid, "institution_id"=>$institution_id]);
+
+		$min_credits = $cdata->min_credits;
 		$max_credits = $cdata->max_credits;
+		if($icChk->num_rows() > 0){
+			$icdata = $icChk->row();
+			$min_credits = $icdata->min_credits;
+			$max_credits = $icdata->max_credits;
+		}
 
 		$max_weightage = round(($min_credits/100)*$weightage);
 		$min_weightage = round(($max_credits/100)*$weightage);
