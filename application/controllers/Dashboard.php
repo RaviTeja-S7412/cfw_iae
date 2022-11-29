@@ -59,6 +59,8 @@ class Dashboard extends CI_Controller {
 	}
 	
 	public function viewDesign(){
+
+		$institution_id = $this->session->userdata('institute_id');
 		
 		$this->db->select("*");
 		$this->db->join("tbl_institute_branches","tbl_institute_branches.id=tbl_institute_curriculum_design.branch_id");
@@ -69,12 +71,19 @@ class Dashboard extends CI_Controller {
 		$data["semesters"] = $this->db->get_where("tbl_semesters",["status"=>1])->result();
 		
 		$weightage = json_decode($data["branch_data"]->weightage);
+
+		$icChk = $this->db->get_where("tbl_institution_course_credits",["course_id"=>$data["branch_data"]->course, "institution_id"=>$institution_id]);
+
+		$min_credits = $data["branch_data"]->min_credits;
+		$max_credits = $data["branch_data"]->max_credits;
+		if($icChk->num_rows() > 0){
+			$icdata = $icChk->row();
+			$min_credits = $icdata->min_credits;
+			$max_credits = $icdata->max_credits;
+		}
 		
 		$weigtages = [];
 		foreach($weightage as $k => $w){
-			
-			$min_credits = $data["branch_data"]->min_credits; 
-			$max_credits = $data["branch_data"]->max_credits;
 			
 			$wdata = [];
 			$wdata["max_weightage"] = round(($min_credits/100)*$w);

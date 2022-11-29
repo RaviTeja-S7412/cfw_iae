@@ -2,6 +2,7 @@
 	$this->load->view("front_common/header"); 
 	$ref = $this->input->get("ref");
 	$institution_id = $this->session->userdata('institute_id');
+	$iData = $this->db->get_where("tbl_institutes",["id"=>$institution_id])->row();
 	
 	$icChk = $this->db->get_where("tbl_institution_course_credits",["course_id"=>$branch_data->course, "institution_id"=>$institution_id]);
 
@@ -24,7 +25,7 @@
 
     <div class="content1">
       <div class="container">
-       	<h4> (<? echo $program->program_name." - ".$course->course_name." - ".$this->db->get_where("tbl_branches",["id"=>$branch_data->branch_name])->row()->branch_name ?>)</h4>
+       	<h4> (<? echo $program->program_name." - ".$course->course_name." - ".$this->db->get_where("tbl_branches",["id"=>$branch_data->branch_name])->row()->branch_name ?>) <span class="pull-right"><a href="#" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#creditsModal">Define Your Own Credits</a></span></h4>
         <div class="col-lg-12 card-col">
         <? if($ref == "view"){ ?>
 			 <a href="<? echo base_url('view-curriculum-designs') ?>">
@@ -121,11 +122,73 @@
         </div>
       </div>
     </div>
+
+	<div id="creditsModal" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+
+			<!-- Modal content-->
+			<div class="modal-content">
+			<div class="modal-header" style="display:block">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Update Credits</h4>
+				<small style="color: red; font-size: 75%">Note: Typical Credits are Lecture Hours - 1, Tutorial Hours - 1, Practicals/ Lab Hours - 2</small>
+			</div>
+			<div class="modal-body">
+				<form method="post" id="updateHRCredits">
+					<div class="form-group">
+						<label>Lecture Hours Credits Per Hr</label>
+						<input type="number" class="form-control" name="lecture_credits" id="lecture_credits" value="<? echo $iData->lecture_credits ?>" placeholder="Lecture Hours Credits Per Hr" required>
+					</div>
+					<div class="form-group">
+						<label>Tutorial Hours Credits Per Hr</label>
+						<input type="number" class="form-control" name="tutorial_credits" id="tutorial_credits" value="<? echo $iData->tutorial_credits ?>" placeholder="Tutorial Hours Credits Per Hr" required>
+					</div>
+					<div class="form-group">
+						<label>Practicals/ Lab Hours Credits Per Hr</label>
+						<input type="number" class="form-control" name="lab_credits" id="lab_credits" value="<? echo $iData->lab_credits ?>" placeholder="Practicals/ Lab Hours Credits Per Hr" required>
+					</div>
+					<div class="form-group">
+						<input type="submit" class="btn btn-primary pull-left" value="Submit">
+					</div>
+				</form>	
+			</div>
+			</div>
+
+		</div>
+	</div>	
     
 <? $this->load->view( "front_common/footer" ) ?>
 
 <script type="text/javascript">
 	
+	$("#updateHRCredits").submit(function(e){
+		
+		e.preventDefault();
+		var lecture_credits = $("#lecture_credits").val();
+		var tutorial_credits = $("#tutorial_credits").val();
+		var lab_credits = $("#lab_credits").val();
+
+		$.ajax({
+			type: "post",
+			data: {lecture_credits: lecture_credits, tutorial_credits: tutorial_credits, lab_credits: lab_credits},
+			url: "<? echo base_url('ajax/updatehourCredits') ?>",
+			success: function(data){
+				swal(
+					'',
+					'Credits Updated Successfully',
+					'success'
+				);
+				setTimeout(() => {
+					location.reload();
+				}, 2000);
+			},
+			error: function(data){
+				console.log(data)
+			}
+		})
+
+	})
+
 	$(".updateCredits").click(function(){
 		
 		var uref = $(this).attr("uref");
@@ -214,7 +277,6 @@
 			dataType : "json",
 			url : "<? echo base_url('dashboard/insertCredits') ?>",
 			success : function(data){
-				console.log(data);
 				if(data.status){
 					swal(
 					  '',
@@ -251,7 +313,6 @@
 			data : fdata,
 			dataType: "json",
 			success : function(data){
-				console.log(data);
 				if(data.status){
 					swal(
 					  '',
@@ -291,17 +352,30 @@
 		var tutorialCredits = $(".getCredittutorial-"+ref).val();
 		var labCredits = $(".getCreditlab-"+ref).val();
 		
-		var lc = (lectureCredits != "") ? parseFloat(lectureCredits) : 0;
-		var tc = (tutorialCredits != "") ? parseFloat(tutorialCredits) : 0;
-		var lac = (labCredits != "") ? parseFloat(labCredits) : 0;
+		<? if($iData->lecture_credits === 0){ ?>
+			var lc = (lectureCredits != "") ? parseFloat(lectureCredits) : 0;
+		<? }else{ ?>
+			var lc = (lectureCredits != "") ? parseFloat(lectureCredits/<? echo $iData->lecture_credits ?>) : 0;
+		<? } ?>	
+
+		<? if($iData->tutorial_credits === 0){ ?>
+			var tc = (tutorialCredits != "") ? parseFloat(tutorialCredits) : 0;
+		<? }else{ ?>
+			var tc = (tutorialCredits != "") ? parseFloat(tutorialCredits/<? echo $iData->tutorial_credits ?>) : 0;
+		<? } ?>	
 		
-		var total = lc+tc+lac/2;
+		<? if($iData->lab_credits === 0){ ?>
+			var lac = (labCredits != "") ? parseFloat(labCredits/2) : 0;
+		<? }else{ ?>
+			var lac = (labCredits != "") ? parseFloat(labCredits/<? echo $iData->lab_credits ?>) : 0;
+		<? } ?>		
+		
+		var total = lc+tc+lac;
 		
 		$(".getCredittotal-"+ref).val(total);
 		
 		var subcatValues = $("input[name='total_credits-"+subid+"[]']")
               .map(function(){
-				  console.log($(this).val()+" ");
 				  return $(this).val();
 			  }).get();
 
@@ -312,9 +386,6 @@
 		var max_weightage = $("#max_weightage-"+subid).val();
 		var min_weightage = $("#min_weightage-"+subid).val();
 		var category = $("#category_name-"+subid).val();
-		
-		
-		console.log(subcatTotal+" "+lc+" "+tc+" "+lac+" "+max_weightage+" "+min_weightage);
 		
 		if(subcatTotal > max_weightage && min_weightage < subcatTotal){
 			swal(
@@ -329,11 +400,25 @@
 			var tutorialCredits1 = $(".getCredittutorial-"+ref).val();
 			var labCredits1 = $(".getCreditlab-"+ref).val();
 
-			var lc1 = (lectureCredits1 != "") ? parseFloat(lectureCredits1) : 0;
-			var tc1 = (tutorialCredits1 != "") ? parseFloat(tutorialCredits1) : 0;
-			var lac1 = (labCredits1 != "") ? parseFloat(labCredits1) : 0;
+			<? if($iData->lecture_credits === 0){ ?>
+				var lc1 = (lectureCredits1 != "") ? parseFloat(lectureCredits1) : 0;
+			<? }else{ ?>
+				var lc1 = (lectureCredits1 != "") ? parseFloat(lectureCredits1/<? echo $iData->lecture_credits ?>) : 0;
+			<? } ?>	
 
-			var total1 = lc1+tc1+lac1/2;
+			<? if($iData->tutorial_credits === 0){ ?>
+				var tc1 = (tutorialCredits1 != "") ? parseFloat(tutorialCredits1) : 0;
+			<? }else{ ?>
+				var tc1 = (tutorialCredits1 != "") ? parseFloat(tutorialCredits1/<? echo $iData->tutorial_credits ?>) : 0;
+			<? } ?>	
+			
+			<? if($iData->lab_credits === 0){ ?>
+				var lac1 = (labCredits1 != "") ? parseFloat(labCredits1/2) : 0;
+			<? }else{ ?>
+				var lac1 = (labCredits1 != "") ? parseFloat(labCredits1/<? echo $iData->lab_credits ?>) : 0;
+			<? } ?>
+
+			var total1 = lc1+tc1+lac1;
 			
 			$(".getCredittotal-"+ref).val(total1);
 			

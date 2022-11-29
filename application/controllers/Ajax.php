@@ -260,5 +260,22 @@ class Ajax extends CI_Controller {
 		}
 
 	}
+
+	public function updatehourCredits(){
+
+		$institution_id = $this->session->userdata('institute_id');
+		$lecture_credits = $this->input->post("lecture_credits");
+		$tutorial_credits = $this->input->post("tutorial_credits");
+		$lab_credits = $this->input->post("lab_credits");
+
+		$data = [
+			"lecture_credits" => $lecture_credits,
+			"tutorial_credits" => $tutorial_credits,
+			"lab_credits" => $lab_credits
+		];
+			
+		$this->db->where(["id"=>$institution_id])->update("tbl_institutes",$data);
+
+	}
 	
 }

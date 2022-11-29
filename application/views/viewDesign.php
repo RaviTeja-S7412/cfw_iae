@@ -1,5 +1,18 @@
-<? $this->load->view("front_common/header"); 
-$ref = $this->input->get("ref");
+<? 
+	$this->load->view("front_common/header"); 
+	$ref = $this->input->get("ref");
+
+	$institution_id = $this->session->userdata('institute_id');
+	
+	$icChk = $this->db->get_where("tbl_institution_course_credits",["course_id"=>$branch_data->course, "institution_id"=>$institution_id]);
+
+	$min_credits = $branch_data->min_credits;
+	$max_credits = $branch_data->max_credits;
+	if($icChk->num_rows() > 0){
+		$icdata = $icChk->row();
+		$min_credits = $icdata->min_credits;
+		$max_credits = $icdata->max_credits;
+	}
 ?>
 <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
 <link href="https://cdn.datatables.net/fixedheader/3.2.2/css/fixedHeader.bootstrap4.min.css" rel="stylesheet" />
@@ -29,10 +42,10 @@ $ref = $this->input->get("ref");
 				</div>
 				<div class="col-lg-6 ml-auto d-flex">
 					<p class="mb-0 text-dark p-1 text-left">
-					  <b style="font-weight: 700">Min Credits:</b> <b><? echo $branch_data->min_credits ?></b>
+					  <b style="font-weight: 700">Min Credits:</b> <b><? echo $min_credits ?></b>
 					</p>
 					<p class="mb-0 text-dark p-1 ml-auto">
-					  <b style="font-weight: 700">Max Credits:</b> <b><? echo $branch_data->max_credits ?></b>
+					  <b style="font-weight: 700">Max Credits:</b> <b><? echo $max_credits ?></b>
 					</p>
 					<p class="mb-0 text-dark p-1 ml-auto">
 					  <b style="font-weight: 700">Credits Assigned:</b> <b class="totalCredits"><? echo $totalCredits ?></b>
