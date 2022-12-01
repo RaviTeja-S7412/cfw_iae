@@ -77,10 +77,13 @@
 						
 					</div>
 					<div class="col-md-12">
-						<p style="margin-left: 125px;color: red;font-size: 14px;font-weight: 500;">Note: Minor variation is allowed as per the need of the respective discipline.</p>	
+						<p style="margin-left: 48px;color: red;font-size: 14px;font-weight: 500;">Note: Minor variation is allowed as per the need of the respective discipline.</p>	
 					</div>
-					<div class="col-lg-12 subcategories_weightages">
+					<div class="col-lg-8 subcategories_weightages">
 						
+					</div>
+					<div class="col-lg-4">
+						<div id="piechart" style="width: 200px; height: 200px;"></div>
 					</div>
 					<div class="col-lg-12" align="center">
 						<input type="hidden" name="bid" value="<? echo $bid ?>">
@@ -169,7 +172,10 @@
 </div>
 
 <? $this->load->view( "front_common/footer" ) ?>
-
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+	
+</script>
 
 <script type="text/javascript">
 
@@ -502,13 +508,13 @@
 			option;
 		
 		var sub_cats = [];
-		  var tax = document.getElementById('sub_cats');
-		  var len = tax.options.length;
+		var tax = document.getElementById('sub_cats');
+		var len = tax.options.length;
 
-		  for (var i = 0; i < len; i++) {
+		for (var i = 0; i < len; i++) {
 			option = tax.options[i];
 			if (option.selected) {
-				 options.push(option);
+					options.push(option);
 
 				var cname = option.getAttribute('cname');
 				var id = option.getAttribute('value');
@@ -516,8 +522,8 @@
 				sub_cats.push({cname:cname,id:id});
 
 			}
+		}
 
-		  }
 		var courses = $("#courses").val();
 
 		<? if($branch_data->branch_name != ""){ ?>
@@ -538,7 +544,41 @@
 				
 				$(".courseweightageLabel").html("("+course+' - '+data.branch+")");
 				$(".subcategories_weightages").html(data.html);
-				$(".subcategories_weightages").html(data.html);
+
+				var onloadWeightages = [['Weightage', 'In %']];
+
+				var options1 = [],
+					option1;
+				var tax1 = document.getElementById('sub_cats');
+				var len1 = tax1.options.length;
+
+				for (var i1 = 0; i1 < len1; i1++) {
+					option1 = tax1.options[i1];
+					if (option1.selected) {
+							options1.push(option1);
+
+						var cname1 = option1.getAttribute('cname');
+						if(i1 > 0)
+							var weightage = $('input[name="weightage[]"]:eq('+(i1-1)+')').val();	
+						onloadWeightages.push([cname1, parseInt(weightage) > 0 ? parseInt(weightage) : 0]);
+
+					}
+				}
+
+				google.charts.load('current', {'packages':['corechart']});
+				google.charts.setOnLoadCallback(drawChart);
+
+				function drawChart() {
+					var data = google.visualization.arrayToDataTable(onloadWeightages);
+
+					var options = {
+						legend: 'none',
+						title: 'Weightage Graph'
+					};
+
+					var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+					chart.draw(data, options);
+				}
 			},
 			error : function(data){
 				console.log(data);
@@ -564,6 +604,40 @@
 			url: "<? echo base_url('ajax/getCreditweightage') ?>",
 			success: function(data){
 				$(".assignCredits-"+sid).html(data);
+
+				var options = [],
+					option;
+				var sub_cats = [['Weightage', 'In %']];
+				var tax = document.getElementById('sub_cats');
+				var len = tax.options.length;
+
+				// var id = 1;
+				for (var i = 0; i < len; i++) {
+					option = tax.options[i];
+					if(i > 0)
+						var weightage = $('input[name="weightage[]"]:eq('+(i-1)+')').val();	
+					if (option.selected) {
+							options.push(option);
+						var cname = option.getAttribute('cname');
+						sub_cats.push([cname, parseInt(weightage) > 0 ? parseInt(weightage) : 0]);
+					}
+				}
+
+				google.charts.load('current', {'packages':['corechart']});
+				google.charts.setOnLoadCallback(drawChart);
+
+				function drawChart() {
+					var data = google.visualization.arrayToDataTable(sub_cats);
+
+					var options = {
+						legend: 'none',
+						title: 'Weightage Graph'
+					};
+
+					var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+					chart.draw(data, options);
+				}
+
 			}
 		})
 		

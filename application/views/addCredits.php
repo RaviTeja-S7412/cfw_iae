@@ -352,19 +352,19 @@
 		var tutorialCredits = $(".getCredittutorial-"+ref).val();
 		var labCredits = $(".getCreditlab-"+ref).val();
 		
-		<? if($iData->lecture_credits === 0){ ?>
+		<? if($iData->lecture_credits == 0){ ?>
 			var lc = (lectureCredits != "") ? parseFloat(lectureCredits) : 0;
 		<? }else{ ?>
 			var lc = (lectureCredits != "") ? parseFloat(lectureCredits/<? echo $iData->lecture_credits ?>) : 0;
 		<? } ?>	
 
-		<? if($iData->tutorial_credits === 0){ ?>
+		<? if($iData->tutorial_credits == 0){ ?>
 			var tc = (tutorialCredits != "") ? parseFloat(tutorialCredits) : 0;
 		<? }else{ ?>
 			var tc = (tutorialCredits != "") ? parseFloat(tutorialCredits/<? echo $iData->tutorial_credits ?>) : 0;
 		<? } ?>	
 		
-		<? if($iData->lab_credits === 0){ ?>
+		<? if($iData->lab_credits == 0){ ?>
 			var lac = (labCredits != "") ? parseFloat(labCredits/2) : 0;
 		<? }else{ ?>
 			var lac = (labCredits != "") ? parseFloat(labCredits/<? echo $iData->lab_credits ?>) : 0;
@@ -400,19 +400,19 @@
 			var tutorialCredits1 = $(".getCredittutorial-"+ref).val();
 			var labCredits1 = $(".getCreditlab-"+ref).val();
 
-			<? if($iData->lecture_credits === 0){ ?>
+			<? if($iData->lecture_credits == 0){ ?>
 				var lc1 = (lectureCredits1 != "") ? parseFloat(lectureCredits1) : 0;
 			<? }else{ ?>
 				var lc1 = (lectureCredits1 != "") ? parseFloat(lectureCredits1/<? echo $iData->lecture_credits ?>) : 0;
 			<? } ?>	
 
-			<? if($iData->tutorial_credits === 0){ ?>
+			<? if($iData->tutorial_credits == 0){ ?>
 				var tc1 = (tutorialCredits1 != "") ? parseFloat(tutorialCredits1) : 0;
 			<? }else{ ?>
 				var tc1 = (tutorialCredits1 != "") ? parseFloat(tutorialCredits1/<? echo $iData->tutorial_credits ?>) : 0;
 			<? } ?>	
 			
-			<? if($iData->lab_credits === 0){ ?>
+			<? if($iData->lab_credits == 0){ ?>
 				var lac1 = (labCredits1 != "") ? parseFloat(labCredits1/2) : 0;
 			<? }else{ ?>
 				var lac1 = (labCredits1 != "") ? parseFloat(labCredits1/<? echo $iData->lab_credits ?>) : 0;
