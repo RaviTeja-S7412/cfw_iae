@@ -38,6 +38,58 @@ class Dashboard extends CI_Controller {
 		$this->load->view('view',$data);
 		
 	}
+
+	public function viewsemester(){
+		
+		
+		$institution_id = $this->session->userdata('institute_id');
+		
+		$this->db->select("*");
+		$this->db->join("tbl_institute_branches","tbl_institute_branches.id=tbl_institute_curriculum_design.branch_id");
+		$this->db->join("tbl_courses","tbl_courses.id=tbl_institute_curriculum_design.course");
+		$data["branch_data"] = $this->db->get_where("tbl_institute_curriculum_design",["branch_id"=>$this->input->get("bid")])->row();
+
+		$semesters = [];
+
+		foreach(json_decode($data["branch_data"]->credits) as $k => $s){
+
+			$subjects = json_decode($data["branch_data"]->subjects, true)[$k];
+
+			foreach($s->semesters as $sk => $sem){
+
+				$sem_name = $this->db->get_where("tbl_semesters",["id"=>$sem])->row()->semester_name; 
+				$subject_category_name = $this->db->get_where("tbl_subject_category",["id"=>$k])->row()->category_name; 
+				$sub_data = $this->db->get_where("tbl_subjects",["id"=>$subjects[$sk]])->row(); 
+				
+				$semesters[] = ["subject_category"=>$subject_category_name,"subject_name"=>$sub_data->subject_name,
+				"ideal_credits"=>$sub_data->ideal_credits,"lecture_hours_per_week"=>$s->lecture_hours_per_week[$sk], "tutorial_hours_per_week"=>$s->tutorial_hours_per_week[$sk], "lab_hours_per_week"=>$s->lab_hours_per_week[$sk], "total_credits"=>$s->total_credits[$sk], "semester_name"=>$sem_name];
+			}
+
+		}
+
+		$sids = array();
+		foreach ($semesters as $sm) {
+			$sids[] = (string) $sm['semester_name'];
+		}
+		$uniqueSids = array_unique($sids);
+
+		$totalCredits = 0;
+		
+		foreach(json_decode($data["branch_data"]->credits) as $sc => $tc){
+			
+			$totalCredits += array_sum($tc->total_credits);
+			
+		}
+		
+		$data["totalCredits"] = $totalCredits;
+		$data["unique_sems"] = $uniqueSids;
+		$data["semesters"] = $semesters;
+		$data["program"] = $this->db->get_where("tbl_programs",["id"=>$data["branch_data"]->program])->row();
+		$data["course"] = $this->db->get_where("tbl_courses",["id"=>$data["branch_data"]->course])->row();
+		
+		$this->load->view('viewSemester',$data);
+		
+	}
 	
 	public function addSubjects(){
 		

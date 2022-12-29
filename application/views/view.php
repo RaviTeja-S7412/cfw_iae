@@ -39,6 +39,7 @@
 							<td><? echo $this->db->get_where("tbl_branches",["id"=>$c->branch_name])->row()->branch_name; ?></td>
 							<td>
 								<a href="<? echo base_url('curriculum-design/view?bid=').$c->id."&ref=view" ?>"><i class="fa fa-eye"></i></a>&nbsp;&nbsp;
+								<a href="<? echo base_url('dashboard/viewsemester?bid=').$c->id ?>"><i class="fa fa-download" data-toggle="tooltip" title="Semester Wise PDF"></i></a>&nbsp;&nbsp;
 								<a href="<? echo base_url('create-design?bid=').$c->id ?>"><i class="fa fa-edit"></i></a>&nbsp;&nbsp;
 								<a href="<? echo base_url('dashboard/delBranch/').$c->id ?>" onClick="return confirm('Are you sure want to delete this branch.')"><i class="fa fa-trash" style="color: red"></i></a>
 							</td>

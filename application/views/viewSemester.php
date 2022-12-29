@@ -34,11 +34,9 @@
         <div class="col-lg-12 card-col">
         	<div class="row mb-3">
 				<div class="col-lg-6">
-					<? if($ref == "view"){ ?>
 					 <a href="<? echo base_url('view-curriculum-designs') ?>">
 						<i class="fa fa-arrow-left backFields pull-left" data-toggle="tooltip" title="Back To Designs" style="cursor: pointer;font-size: 25px;"></i>
 					 </a>
-					<? } ?>
 				</div>
 				<div class="col-lg-6 ml-auto d-flex">
 					<p class="mb-0 text-dark p-1 text-left">
@@ -53,48 +51,46 @@
 					<i class="fa fa-download downloadPdf pull-right mt-1 ml-3" onClick="printDiv()" data-toggle="tooltip" title="Download PDF" style="cursor: pointer;font-size: 22px;"></i>
 				</div>
        		</div>
-        <? foreach($sub_categories as $key => $sc){
+        <? 
+			foreach($unique_sems as $key => $sc){
 			
 				$weigh = json_decode($branch_data->weightage)->$sc;
 				$scat = $this->db->select("category_name")->get_where("tbl_subject_category",["id"=>$sc,"status"=>1])->row();
 				$w = $weigtages[$sc];
 		?>
           
-			  <h6><strong><? echo $scat->category_name ?> (Weightage: <? echo $weigh." %" ?>) (Credits: <? echo $w["max_weightage"]." - ".$w["min_weightage"] ?>, Added: <b class="weightage_added-<? echo $sc ?>"><? echo $scatcredits[$sc] ?></b>)</strong></h6>
+			  <h6><strong> Semester <? echo $sc ?> </strong></h6>
 			  <table id="example" class="table table-striped table-bordered" style="font-size: 14px">
 				<thead>
 				  <tr>
+					<th scope="col">Subject Category</th>
 					<th scope="col">Subject</th>
 					<th scope="col">Ideal Credits</th>
 					<th scope="col">Lecture Hours Per Week</th>
 					<th scope="col">Tutorial Hours Per Week</th>
 					<th scope="col">Practicals/ Lab Hours Per Week</th>
 					<th scope="col">Credits</th>
-					<th scope="col">Semester</th>
 				  </tr>
 				</thead>
 				<tbody>
 				  
 				<? 
-					$subjects = json_decode($branch_data->subjects)->$sc;
 						
-					foreach($subjects as $sk => $sub){
-						
-						$randomkey = random_string("alnum",10);
-						$sdata = $this->db->get_where("tbl_subjects",["id"=>$sub])->row();
+					foreach($semesters as $sk => $sub){
 
-						$creditsData = json_decode($branch_data->credits)->$sc;
+						if($sub['semester_name'] == $sc){
+						
 				?>
 					  <tr>
-						<td scope="row" style="text-align: left"><? echo $sdata->subject_name; ?></td>
-						<td><? echo $sdata->ideal_credits ?></td>
-						<td><? echo $creditsData->lecture_hours_per_week[$sk] ?></td>
-						<td><? echo $creditsData->tutorial_hours_per_week[$sk] ?></td>
-						<td><? echo $creditsData->lab_hours_per_week[$sk] ?></td>
-						<td><? echo $creditsData->total_credits[$sk] ?></td>
-						<td><? echo $this->db->get_where("tbl_semesters",["id"=>$creditsData->semesters[$sk]])->row()->semester_name; ?></td>
+						<td scope="row" style="text-align: left"><? echo $sub['subject_category']; ?></td>
+						<td scope="row" style="text-align: left"><? echo $sub['subject_name']; ?></td>
+						<td><? echo $sub['ideal_credits'] ?></td>
+						<td><? echo $sub['lecture_hours_per_week'] ?></td>
+						<td><? echo $sub['tutorial_hours_per_week'] ?></td>
+						<td><? echo $sub['lab_hours_per_week'] ?></td>
+						<td><? echo $sub['total_credits'] ?></td>
 					  </tr>
-				<? } ?>
+				<? }} ?>
 					  
 				</tbody>
 			  </table>
@@ -121,15 +117,10 @@
 	  newWin.document.open();
 		
 		newWin.document.write('<link rel="stylesheet" href="<? echo base_url() ?>assets/css/bootstrap.min.css"/>');
-//		newWin.document.write('<s tyle type="text/css">#example th{background: #0c355d;color: #fff;}</style>');
-
 		newWin.document.write('</head><body onload="window.print()">');
 		newWin.document.write(divToPrint.innerHTML);
 		newWin.document.write('</body></html>');
-
-//	  newWin.document.write('<html><body onload="window.print()">'+divToPrint.innerHTML+'</body></html>');
-
-	  newWin.document.close();
+		newWin.document.close();
 
 	  setTimeout(function(){newWin.close();},10);
 
