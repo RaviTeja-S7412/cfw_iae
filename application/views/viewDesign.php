@@ -50,17 +50,18 @@
 					<p class="mb-0 text-dark p-1 ml-auto">
 					  <b style="font-weight: 700">Credits Assigned:</b> <b class="totalCredits"><? echo $totalCredits ?></b>
 					</p>
-					<i class="fa fa-download downloadPdf pull-right mt-1 ml-3" onClick="printDiv()" data-toggle="tooltip" title="Download PDF" style="cursor: pointer;font-size: 22px;"></i>
+					<a target="_blank" href="<? echo base_url('dashboard/downloadPdf/'.$this->input->get('bid')) ?>"><i class="fa fa-download downloadPdf pull-right mt-1 ml-3" data-toggle="tooltip" title="Download PDF" style="cursor: pointer;font-size: 22px;"></i></a>
 				</div>
        		</div>
         <? foreach($sub_categories as $key => $sc){
 			
 				$weigh = json_decode($branch_data->weightage)->$sc;
 				$scat = $this->db->select("category_name")->get_where("tbl_subject_category",["id"=>$sc,"status"=>1])->row();
+				$uWeightage = round($weigh/array_sum(json_decode($branch_data->weightage, true))*100);
 				$w = $weigtages[$sc];
 		?>
           
-			  <h6><strong><? echo $scat->category_name ?> (Weightage: <? echo $weigh." %" ?>) (Credits: <? echo $w["max_weightage"]." - ".$w["min_weightage"] ?>, Added: <b class="weightage_added-<? echo $sc ?>"><? echo $scatcredits[$sc] ?></b>)</strong></h6>
+			  <h6><strong><? echo $scat->category_name ?> (Weightage: <? echo $uWeightage." %" ?>) (Credits: <? echo $weigh ?>, Added: <b class="weightage_added-<? echo $sc ?>"><? echo $scatcredits[$sc] ?></b>)</strong></h6>
 			  <table id="example" class="table table-striped table-bordered" style="font-size: 14px">
 				<thead>
 				  <tr>

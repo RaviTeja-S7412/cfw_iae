@@ -27,7 +27,7 @@ class Dashboard extends CI_Controller {
 			$data["sub_categories"] = json_decode($data["branch_data"]->subject_categories);	
 		}
 		
-		$data["programs"] = $this->db->get_where("tbl_programs",["status"=>1,"deleted"=>0])->result();
+		$data["programs"] = $this->db->order_by("program_name","asc")->get_where("tbl_programs",["status"=>1,"deleted"=>0])->result();
 		$this->load->view('create',$data);
 		
 	}
@@ -165,6 +165,248 @@ class Dashboard extends CI_Controller {
 		$this->load->view('viewDesign',$data);
 		
 	}
+
+	public function downloadPdf($bid){
+
+		require_once(APPPATH.'libraries/mpdf/mpdf.php');
+		$mpdf = new \mPDF('UTF-8', [300,215]);
+
+		$institution_id = $this->session->userdata('institute_id');
+		
+		$this->db->select("*");
+		$this->db->join("tbl_institute_branches","tbl_institute_branches.id=tbl_institute_curriculum_design.branch_id");
+		$this->db->join("tbl_courses","tbl_courses.id=tbl_institute_curriculum_design.course");
+		$data["branch_data"] = $this->db->get_where("tbl_institute_curriculum_design",["branch_id"=>$bid])->row();
+		
+		$sub_categories = json_decode($data["branch_data"]->subject_categories);
+		$data["semesters"] = $this->db->get_where("tbl_semesters",["status"=>1])->result();
+		$inst = $this->db->get_where("tbl_institutes",["id"=>$institution_id])->row();
+		
+		$weightage = json_decode($data["branch_data"]->weightage);
+
+		$icChk = $this->db->get_where("tbl_institution_course_credits",["course_id"=>$data["branch_data"]->course, "institution_id"=>$institution_id]);
+
+		$min_credits = $data["branch_data"]->min_credits;
+		$max_credits = $data["branch_data"]->max_credits;
+		if($icChk->num_rows() > 0){
+			$icdata = $icChk->row();
+			$min_credits = $icdata->min_credits;
+			$max_credits = $icdata->max_credits;
+		}
+		
+		$weigtages = [];
+		foreach($weightage as $k => $w){
+			
+			$wdata = [];
+			$wdata["max_weightage"] = round(($min_credits/100)*$w);
+			$wdata["min_weightage"] = round(($max_credits/100)*$w);
+			$weigtages[$k] = $wdata;
+			
+		}
+		
+		$totalCredits = 0;
+		$scatcredits = [];
+		foreach(json_decode($data["branch_data"]->credits) as $sc => $tc){
+			
+			$totalCredits += array_sum($tc->total_credits);
+			$scatcredits[$sc] = array_sum($tc->total_credits);
+			
+		}
+		
+		$weigtages = $weigtages;
+		$totalCredits = $totalCredits;
+		$scatcredits = $scatcredits;
+		$program = $this->db->get_where("tbl_programs",["id"=>$data["branch_data"]->program])->row();
+		$course = $this->db->get_where("tbl_courses",["id"=>$data["branch_data"]->course])->row();
+
+		$html = '<div style="font-family:helvetica; width:70%; margin:auto; padding:10px;">
+		<div class="container">
+			 <h4 style="text-align:center; font-size: 22px;">('.$program->program_name." - ".$course->course_name." - ".$this->db->get_where("tbl_branches",["id"=>$data["branch_data"]->branch_name])->row()->branch_name.')</h4>
+		  <div class="col-lg-12 card-col">
+		  			<div>
+					  <ul style="font-size:14px; width:60%; list-style:none; display:inline-block;margin-left:auto;">
+					  	<span><b style="font-weight: 700;">Min Credits: '.$min_credits.'</b></span>
+					  	<span><b style="font-weight: 700">Max Credits: '.$max_credits.'</b></span>
+					  	<span><b style="font-weight: 700">Credits Assigned: '.$totalCredits.'</b></span>
+					  </ul>
+				 	</div>';
+		  		foreach($sub_categories as $key => $sc){
+			  
+				  $weigh = json_decode($data["branch_data"]->weightage)->$sc;
+				  $scat = $this->db->select("category_name")->get_where("tbl_subject_category",["id"=>$sc,"status"=>1])->row();
+				  $uWeightage = round($weigh/array_sum(json_decode($data["branch_data"]->weightage, true))*100);
+				  $w = $weigtages[$sc];
+			
+				  $html .= '<h4 style="font-size: 15px;"><strong>'.$scat->category_name.' (Weightage: '.$uWeightage." %".') (Credits: '.$weigh.', Added: <b class="weightage_added-'.$sc.'">'.$scatcredits[$sc].'</b>)</strong></h4>
+				<table style="font-size: 14px;">
+				  <thead>
+					<tr style="border:1px solid gray;">
+					  <th scope="col" style="border:1px solid gray;">Subject</th>
+					  <th scope="col" style="border:1px solid gray;">Ideal Credits</th>
+					  <th scope="col" style="border:1px solid gray;">Lecture Hours Per Week</th>
+					  <th scope="col" style="border:1px solid gray;">Tutorial Hours Per Week</th>
+					  <th scope="col" style="border:1px solid gray;">Practicals/ Lab Hours Per Week</th>
+					  <th scope="col" style="border:1px solid gray;">Credits</th>
+					  <th scope="col" style="border:1px solid gray;">Semester</th>
+					</tr>
+				  </thead>
+				  <tbody>';
+					
+					  $subjects = json_decode($data["branch_data"]->subjects)->$sc;
+						  
+					  foreach($subjects as $sk => $sub){
+						  
+						  $randomkey = random_string("alnum",10);
+						  $sdata = $this->db->get_where("tbl_subjects",["id"=>$sub])->row();
+  
+						  $creditsData = json_decode($data["branch_data"]->credits)->$sc;
+				  
+						$html .= '<tr  style="border:1px solid gray;">
+						  <td scope="row" style="text-align: left; border:1px solid gray;">'.$sdata->subject_name.'</td>
+						  <td  style="border:1px solid gray;">'.$sdata->ideal_credits.'</td>
+						  <td style="border:1px solid gray;">'.$creditsData->lecture_hours_per_week[$sk].'</td>
+						  <td style="border:1px solid gray;">'.$creditsData->tutorial_hours_per_week[$sk].'</td>
+						  <td style="border:1px solid gray;">'.$creditsData->lab_hours_per_week[$sk].'</td>
+						  <td style="border:1px solid gray;">'.$creditsData->total_credits[$sk].'</td>
+						  <td style="border:1px solid gray;">'.$this->db->get_where("tbl_semesters",["id"=>$creditsData->semesters[$sk]])->row()->semester_name.'</td>
+						</tr>';
+				   	}
+						
+				$html .= '</tbody>
+				</table>
+				<br>';
+		    }  
+			$html .= '</div>
+		</div>
+	  </div>';
+
+	
+	  $mpdf->WriteHTML($html);
+	  $mpdf->Output($inst->institute_name.".pdf","D");
+
+	}
+
+	public function downloadsemesterPdf($bid){
+
+		require_once(APPPATH.'libraries/mpdf/mpdf.php');
+		$mpdf = new \mPDF('UTF-8', [300,215]);
+
+		$institution_id = $this->session->userdata('institute_id');
+		$inst = $this->db->get_where("tbl_institutes",["id"=>$institution_id])->row();
+		
+		$this->db->select("*");
+		$this->db->join("tbl_institute_branches","tbl_institute_branches.id=tbl_institute_curriculum_design.branch_id");
+		$this->db->join("tbl_courses","tbl_courses.id=tbl_institute_curriculum_design.course");
+		$data["branch_data"] = $this->db->get_where("tbl_institute_curriculum_design",["branch_id"=>$bid])->row();
+
+		$semesters = [];
+
+		foreach(json_decode($data["branch_data"]->credits) as $k => $s){
+
+			$subjects = json_decode($data["branch_data"]->subjects, true)[$k];
+
+			foreach($s->semesters as $sk => $sem){
+
+				$sem_name = $this->db->get_where("tbl_semesters",["id"=>$sem])->row()->semester_name; 
+				$subject_category_name = $this->db->get_where("tbl_subject_category",["id"=>$k])->row()->category_name; 
+				$sub_data = $this->db->get_where("tbl_subjects",["id"=>$subjects[$sk]])->row(); 
+				
+				$semesters[] = ["subject_category"=>$subject_category_name,"subject_name"=>$sub_data->subject_name,
+				"ideal_credits"=>$sub_data->ideal_credits,"lecture_hours_per_week"=>$s->lecture_hours_per_week[$sk], "tutorial_hours_per_week"=>$s->tutorial_hours_per_week[$sk], "lab_hours_per_week"=>$s->lab_hours_per_week[$sk], "total_credits"=>$s->total_credits[$sk], "semester_name"=>$sem_name];
+			}
+
+		}
+
+		$sids = array();
+		foreach ($semesters as $sm) {
+			$sids[] = (string) $sm['semester_name'];
+		}
+		$uniqueSids = array_unique($sids);
+
+		$totalCredits = 0;
+		
+		foreach(json_decode($data["branch_data"]->credits) as $sc => $tc){
+			
+			$totalCredits += array_sum($tc->total_credits);
+			
+		}
+		
+		$data["totalCredits"] = $totalCredits;
+		$unique_sems = $uniqueSids;
+		$semesters = $semesters;
+		$program = $this->db->get_where("tbl_programs",["id"=>$data["branch_data"]->program])->row();
+		$course = $this->db->get_where("tbl_courses",["id"=>$data["branch_data"]->course])->row();
+
+		$icChk = $this->db->get_where("tbl_institution_course_credits",["course_id"=>$data["branch_data"]->course, "institution_id"=>$institution_id]);
+
+		$min_credits = $data["branch_data"]->min_credits;
+		$max_credits = $data["branch_data"]->max_credits;
+		if($icChk->num_rows() > 0){
+			$icdata = $icChk->row();
+			$min_credits = $icdata->min_credits;
+			$max_credits = $icdata->max_credits;
+		}
+
+		$html = '<div style="font-family:helvetica; width:70%; margin:auto; padding:10px;">
+		<div class="container">
+			 <h4 style="text-align:center; font-size: 22px;">('.$program->program_name." - ".$course->course_name." - ".$this->db->get_where("tbl_branches",["id"=>$data["branch_data"]->branch_name])->row()->branch_name.')</h4>
+		  <div class="col-lg-12 card-col">
+		  			<div>
+					  <ul style="font-size:14px; width:60%; list-style:none; display:inline-block;margin-left:auto;">
+					  	<span><b style="font-weight: 700;">Min Credits: '.$min_credits.'</b></span>
+					  	<span><b style="font-weight: 700">Max Credits: '.$max_credits.'</b></span>
+					  	<span><b style="font-weight: 700">Credits Assigned: '.$totalCredits.'</b></span>
+					  </ul>
+				 	</div>';
+				foreach($unique_sems as $key => $sc){
+	
+					$weigh = json_decode($data["branch_data"]->weightage)->$sc;
+					$scat = $this->db->select("category_name")->get_where("tbl_subject_category",["id"=>$sc,"status"=>1])->row();
+					$w = $weigtages[$sc];
+			
+				  $html .= '<h4 style="font-size: 15px;"><strong>Semester - '.$sc.'</strong></h4>
+				<table style="font-size: 14px;">
+				  <thead>
+					<tr style="border:1px solid gray;">
+					  <th scope="col" style="border:1px solid gray;">Subject Category</th>
+					  <th scope="col" style="border:1px solid gray;">Subject</th>
+					  <th scope="col" style="border:1px solid gray;">Ideal Credits</th>
+					  <th scope="col" style="border:1px solid gray;">Lecture Hours Per Week</th>
+					  <th scope="col" style="border:1px solid gray;">Tutorial Hours Per Week</th>
+					  <th scope="col" style="border:1px solid gray;">Practicals/ Lab Hours Per Week</th>
+					  <th scope="col" style="border:1px solid gray;">Credits</th>
+					</tr>
+				  </thead>
+				  <tbody>';
+					
+				  foreach($semesters as $sk => $sub){
+
+					if($sub['semester_name'] == $sc){
+				  
+						$html .= '<tr  style="border:1px solid gray;">
+						  <td scope="row" style="text-align: left; border:1px solid gray;">'.$sub['subject_category'].'</td>
+						  <td scope="row" style="text-align: left; border:1px solid gray;">'.$sub['subject_name'].'</td>
+						  <td  style="border:1px solid gray;">'.$sub['ideal_credits'].'</td>
+						  <td style="border:1px solid gray;">'.$sub['lecture_hours_per_week'].'</td>
+						  <td style="border:1px solid gray;">'.$sub['tutorial_hours_per_week'].'</td>
+						  <td style="border:1px solid gray;">'.$sub['lab_hours_per_week'].'</td>
+						  <td style="border:1px solid gray;">'.$sub['total_credits'].'</td>
+						</tr>';
+				   	}
+				}
+						
+				$html .= '</tbody>
+				</table>
+				<br>';
+		    }  
+			$html .= '</div>
+		</div>
+	  </div>';
+
+	  $mpdf->WriteHTML($html);
+	  $mpdf->Output($inst->institute_name.".pdf","D");
+
+	}
 	
 	public function addCredits(){
 
@@ -229,6 +471,7 @@ class Dashboard extends CI_Controller {
 		$bd = $this->db->get_where("tbl_institute_branches",["id"=>$bid])->row();
 		$bdata = $this->db->get_where("tbl_institute_curriculum_design",["branch_id"=>$bid])->row();
 		$cdata = $this->db->get_where("tbl_courses",["id"=>$bdata->course])->row();
+		$iccdata = $this->db->get_where("tbl_institution_course_credits",["institution_id"=>$this->session->userdata("institute_id"),"course_id"=>$bdata->course])->row();
 		
 		$subCats = json_decode($bdata->subject_categories);
 		
@@ -318,7 +561,12 @@ class Dashboard extends CI_Controller {
 
 			}
 
-			if($totalCredits < $cdata->min_credits){
+			$mCredits = $cdata->min_credits;
+			if($iccdata->min_credits){
+				$mCredits = $iccdata->min_credits;
+			}
+
+			if($totalCredits < $mCredits){
 
 				echo json_encode(["status"=>false,"msg"=>"Total Credits Should Not be Less than Minimum Credits."]);
 				exit();
@@ -406,13 +654,31 @@ class Dashboard extends CI_Controller {
 		$weightage = $this->input->post("weightage");
 		$sub_cats = $this->input->post("sub_cats");
 		$bid = $this->input->post("bid");
-		
-		if(round(array_sum($weightage),1) != round(100,1)){
+
+		$cdata = $this->db->get_where("tbl_courses",["id"=>$course])->row();
+
+		$icChk = $this->db->get_where("tbl_institution_course_credits",["course_id"=>$course, "institution_id"=>$inst_id]);
+
+		$min_credits = $cdata->min_credits;
+		$max_credits = $cdata->max_credits;
+		if($icChk->num_rows() > 0){
+			$icdata = $icChk->row();
+			$min_credits = $icdata->min_credits;
+			$max_credits = $icdata->max_credits;
+		}
+
+		if((round(array_sum($weightage),1) < $min_credits) && (round(array_sum($weightage),1) < $min_credits)){
+
+			echo json_encode(["status"=>false,"msg"=>"Credits Should be in between $min_credits & $max_credits."]);
+			exit();
+
+		}
+		/* if(round(array_sum($weightage),1) != round(100,1)){
 			
 			echo json_encode(["status"=>false,"msg"=>"weightage should be equal to 100%."]);
 			exit();
 			
-		}
+		} */
 		
 		$d = $this->session->set_userdata("branch_data",json_encode($_POST));
 		

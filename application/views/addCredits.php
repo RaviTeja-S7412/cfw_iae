@@ -1,6 +1,7 @@
 <? 
 	$this->load->view("front_common/header"); 
 	$ref = $this->input->get("ref");
+	$branch_id = $this->input->get("bid");
 	$institution_id = $this->session->userdata('institute_id');
 	$iData = $this->db->get_where("tbl_institutes",["id"=>$institution_id])->row();
 	
@@ -31,7 +32,9 @@
 			 <a href="<? echo base_url('view-curriculum-designs') ?>">
 				<i class="fa fa-arrow-left fa-2x backFields pull-right" data-toggle="tooltip" title="Back To Designs" style="cursor: pointer"></i>
 			 </a>
-         <? } ?>
+         <? }else{ ?>
+			<a href="<? echo base_url('create-design/add-subjects') ?><? echo $branch_id ? "?bid=$branch_id" : '' ?>"><i class="fa fa-arrow-left backFields pull-left" style="cursor: pointer; font-size:22px"></i></a>
+		 <? } ?>
          
           <div class="col-lg-6 ml-auto d-flex">
             <p class="mb-0 text-dark p-1 text-left">
@@ -46,13 +49,12 @@
           </div>
           <form method="post" id="addCredits">
         <? foreach($sub_categories as $key => $sc){
-			
 				$weigh = json_decode($branch_data->weightage)->$sc;
 				$scat = $this->db->select("category_name")->get_where("tbl_subject_category",["id"=>$sc,"status"=>1])->row();
+				$uWeightage = round($weigh/array_sum(json_decode($branch_data->weightage, true))*100);
 				$w = $weigtages[$sc];
 		?>
-          
-			  <h6><strong><? echo $scat->category_name ?> (Weightage: <? echo $weigh." %" ?>) (Credits: <? echo $w["max_weightage"]." - ".$w["min_weightage"] ?>, Added: <b class="weightage_added-<? echo $sc ?>"><? echo $scatcredits[$sc] ?></b>)</strong></h6>
+			  <h6><strong><? echo $scat->category_name ?> (Weightage: <? echo $uWeightage." %" ?>) (Credits: <? echo $weigh ?>, Added: <b class="weightage_added-<? echo $sc ?>"><? echo $scatcredits[$sc] ?></b>)</strong></h6>
 			  <table class="table text-center table-bordered" style="font-size: 14px">
 				<thead class="thead-dark">
 				  <tr>
@@ -67,6 +69,7 @@
 				</thead>
 				<tbody>
 			  
+			  	<input type="hidden" name="credit_weightage-<? echo $sc ?>" id="credit_weightage-<? echo $sc ?>" value="<? echo $weigh ?>">
 			  	<input type="hidden" name="max_weightage-<? echo $sc ?>" id="max_weightage-<? echo $sc ?>" value="<? echo $w["max_weightage"] ?>">
 			  	<input type="hidden" name="min_weightage-<? echo $sc ?>" id="min_weightage-<? echo $sc ?>" value="<? echo $w["min_weightage"] ?>">
 			  	<input type="hidden" name="category_name-<? echo $sc ?>" id="category_name-<? echo $sc ?>" value="<? echo $scat->category_name ?>">
@@ -137,15 +140,15 @@
 				<form method="post" id="updateHRCredits">
 					<div class="form-group">
 						<label>Lecture Hours Credits Per Hr</label>
-						<input type="number" class="form-control" name="lecture_credits" id="lecture_credits" value="<? echo $iData->lecture_credits ?>" placeholder="Lecture Hours Credits Per Hr" required>
+						<input type="number" step="0.01" class="form-control" name="lecture_credits" id="lecture_credits" value="<? echo $iData->lecture_credits ?>" placeholder="Lecture Hours Credits Per Hr" required>
 					</div>
 					<div class="form-group">
 						<label>Tutorial Hours Credits Per Hr</label>
-						<input type="number" class="form-control" name="tutorial_credits" id="tutorial_credits" value="<? echo $iData->tutorial_credits ?>" placeholder="Tutorial Hours Credits Per Hr" required>
+						<input type="number" step="0.01" class="form-control" name="tutorial_credits" id="tutorial_credits" value="<? echo $iData->tutorial_credits ?>" placeholder="Tutorial Hours Credits Per Hr" required>
 					</div>
 					<div class="form-group">
 						<label>Practicals/ Lab Hours Credits Per Hr</label>
-						<input type="number" class="form-control" name="lab_credits" id="lab_credits" value="<? echo $iData->lab_credits ?>" placeholder="Practicals/ Lab Hours Credits Per Hr" required>
+						<input type="number" step="0.01" class="form-control" name="lab_credits" id="lab_credits" value="<? echo $iData->lab_credits ?>" placeholder="Practicals/ Lab Hours Credits Per Hr" required>
 					</div>
 					<div class="form-group">
 						<input type="submit" class="btn btn-primary pull-left" value="Submit">
@@ -245,6 +248,18 @@
 				total_credits.push($(this).val());   
 			}    
 		});
+
+		var g20 = total_credits.filter(v => +v > 20).map(Number)
+
+		/* if(g20.length > 0){
+			swal(
+				'',
+				'Total value of Credits are not more than 20 for each semister.',
+				'error'
+			);
+			return false;
+		} */
+
 		if(total_credits.length == 0){
 			swal(
 			  '',
@@ -355,23 +370,23 @@
 		<? if($iData->lecture_credits == 0){ ?>
 			var lc = (lectureCredits != "") ? parseFloat(lectureCredits) : 0;
 		<? }else{ ?>
-			var lc = (lectureCredits != "") ? parseFloat(lectureCredits/<? echo $iData->lecture_credits ?>) : 0;
+			var lc = (lectureCredits != "") ? parseFloat(lectureCredits*<? echo $iData->lecture_credits ?>) : 0;
 		<? } ?>	
 
 		<? if($iData->tutorial_credits == 0){ ?>
 			var tc = (tutorialCredits != "") ? parseFloat(tutorialCredits) : 0;
 		<? }else{ ?>
-			var tc = (tutorialCredits != "") ? parseFloat(tutorialCredits/<? echo $iData->tutorial_credits ?>) : 0;
+			var tc = (tutorialCredits != "") ? parseFloat(tutorialCredits*<? echo $iData->tutorial_credits ?>) : 0;
 		<? } ?>	
 		
 		<? if($iData->lab_credits == 0){ ?>
-			var lac = (labCredits != "") ? parseFloat(labCredits/2) : 0;
+			var lac = (labCredits != "") ? parseFloat(2/labCredits) : 0;
 		<? }else{ ?>
-			var lac = (labCredits != "") ? parseFloat(labCredits/<? echo $iData->lab_credits ?>) : 0;
+			var lac = (labCredits != "") ? parseFloat(labCredits*<? echo $iData->lab_credits ?>) : 0;
 		<? } ?>		
 		
 		var total = lc+tc+lac;
-		
+
 		$(".getCredittotal-"+ref).val(total);
 		
 		var subcatValues = $("input[name='total_credits-"+subid+"[]']")
@@ -383,14 +398,24 @@
 		$.each(subcatValues,function(){subcatTotal+=parseFloat(this) || 0;});
 		
 		
+		var credit_weightage = $("#credit_weightage-"+subid).val();
 		var max_weightage = $("#max_weightage-"+subid).val();
 		var min_weightage = $("#min_weightage-"+subid).val();
 		var category = $("#category_name-"+subid).val();
-		
-		if(subcatTotal > max_weightage && min_weightage < subcatTotal){
+
+		if(parseFloat(total) > 20){
 			swal(
 			  '',
-			  'Total value of Credits are more than given weightage please modify credits for '+category,
+			  'Total value of Credits are not more than 20 for each semister for '+category,
+			  'error'
+			);
+			// return false;
+		}
+		
+		if(subcatTotal > credit_weightage){
+			swal(
+			  '',
+			  'Total value of Credits are not equal to given credits please modify credits for '+category,
 			  'error'
 			);
 			
@@ -403,19 +428,19 @@
 			<? if($iData->lecture_credits == 0){ ?>
 				var lc1 = (lectureCredits1 != "") ? parseFloat(lectureCredits1) : 0;
 			<? }else{ ?>
-				var lc1 = (lectureCredits1 != "") ? parseFloat(lectureCredits1/<? echo $iData->lecture_credits ?>) : 0;
+				var lc1 = (lectureCredits1 != "") ? parseFloat(lectureCredits1*<? echo $iData->lecture_credits ?>) : 0;
 			<? } ?>	
 
 			<? if($iData->tutorial_credits == 0){ ?>
 				var tc1 = (tutorialCredits1 != "") ? parseFloat(tutorialCredits1) : 0;
 			<? }else{ ?>
-				var tc1 = (tutorialCredits1 != "") ? parseFloat(tutorialCredits1/<? echo $iData->tutorial_credits ?>) : 0;
+				var tc1 = (tutorialCredits1 != "") ? parseFloat(tutorialCredits1*<? echo $iData->tutorial_credits ?>) : 0;
 			<? } ?>	
 			
 			<? if($iData->lab_credits == 0){ ?>
-				var lac1 = (labCredits1 != "") ? parseFloat(labCredits1/2) : 0;
+				var lac1 = (labCredits1 != "") ? parseFloat(labCredits1*2) : 0;
 			<? }else{ ?>
-				var lac1 = (labCredits1 != "") ? parseFloat(labCredits1/<? echo $iData->lab_credits ?>) : 0;
+				var lac1 = (labCredits1 != "") ? parseFloat(labCredits1*<? echo $iData->lab_credits ?>) : 0;
 			<? } ?>
 
 			var total1 = lc1+tc1+lac1;

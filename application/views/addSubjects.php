@@ -1,4 +1,7 @@
-<? $this->load->view("front_common/header") ?>
+<? 
+	$this->load->view("front_common/header"); 
+	$branch_id = $this->input->get("bid");
+?>
 
 <style>
 
@@ -17,6 +20,7 @@
        <!-- <form method="post" id="addSubjects" action="#<? //echo base_url("dashboard/insertSubjects") ?>"> -->
         <form method="post" id="addSubjects">
 			<div class="col-lg-12 card-col">
+				<a href="<? echo base_url('create-design') ?><? echo $branch_id ? "?bid=$branch_id" : '' ?>"><i class="fa fa-arrow-left backFields pull-left" style="cursor: pointer; font-size:22px"></i></a>
 
 				<? if(count($sub_categories) > 0){ 
 					foreach($sub_categories as $key => $sc){
@@ -27,13 +31,14 @@
 						$exOpenelectivedata = json_decode($ubranch_data->open_electives)->$sc;
 						
 				?>
-
-					<h5><? echo $scdata->category_name ?></h5>
+						
+					<h5 style="text-align: center; margin-top: 20px"><? echo $scdata->category_name ?></h5>
+					<hr />
 						<select multiple="multiple" name="subjects-<? echo $sc ?>[]" id="subjects-<? echo $sc ?>" title="duallistbox_demo1[]">
 						<?
 							$this->db->select("tbl_subjects.id,tbl_subjects.subject_name");
 							$this->db->join("tbl_subjects","tbl_sub_subcat_links.subject=tbl_subjects.id");
-							$subjects = $this->db->get_where("tbl_sub_subcat_links",["tbl_sub_subcat_links.subject_category"=>$sc,"tbl_subjects.elective_status"=>"all"])->result();
+							$subjects = $this->db->order_by("tbl_subjects.subject_name","asc")->get_where("tbl_sub_subcat_links",["tbl_sub_subcat_links.subject_category"=>$sc,"tbl_subjects.elective_status"=>"all"])->result();
 									
 							foreach($subjects as $sub){		
 						
@@ -49,7 +54,8 @@
 						</select>
 					<div class="row" style="margin-top:10px; margin-bottom:10px">
 						<div class="col-md-12">
-							<input type="button" class="btn btn-info pull-left new_subjects" course_category="<? echo $sc ?>" value="Add New Subjects">
+							<!-- <input type="button" class="btn btn-info pull-left new_subjects" course_category="<? //echo $sc ?>" value="Add New Subjects"> -->
+							<small style="color: red;">Didn’t find the Subject what you are looking for? <a href="javascript:void(0)" class="new_subjects" course_category="<? echo $sc ?>">Click here</a> to add New Subject</small>
 						</div>
 					</div>
 					<div class="row">
@@ -99,7 +105,7 @@
 
 				<? } ?>	
 					<input type="hidden" name="bid" value="<? echo $this->input->get("bid") ?>">
-					<input type="submit" class="btn btn-primary" value="Submit">
+					<input type="submit" class="btn btn-primary pull-right" value="Save & Next">
 				<? } ?>		
 			  <br><br>
 			</div>

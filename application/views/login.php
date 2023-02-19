@@ -1,6 +1,6 @@
 <? $this->load->view("front_common/header") ?>
 
-	<div class="content">
+	<div class="content1">
       <div class="container">
         <div class="row">
           <div class="col-md-6">
@@ -80,6 +80,17 @@
 					</form>
              	</div>
               </div>
+			  <div class="col-md-12">
+				<p style="color: #000; padding-top: 20px;">Curriculum Framework-Course Planner Software Tool for Course Sequencing and Credit Distribution.</p>
+				<p style="color: #000;">
+					Designed to meet the requirements of
+				</p>
+				<ol style="font-family: Roboto, sans-serif; font-weight: 300">
+					<li>Multiple Entry and Exit</li>
+					<li>Choice Based Credit System (CBCS)</li>
+					<li>NAAC Framework</li>
+				</ol>
+			  </div>
             </div>
           </div>
         </div>

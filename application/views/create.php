@@ -10,7 +10,7 @@
 	}
 
 	.bootstrap-duallistbox-container select{
-		height: 180px !important;
+		height: 360px !important;
 	}
 
 </style>
@@ -38,7 +38,7 @@
 					</div>
 					<div class="col-lg-9 cnote" style="margin-top: 20px; display: none">
 						<p style="font-size: 12px; color: red; font-weight: 500">Note: Typical credits are: Minimum – <span id="cmin"></span>, Maximum – <span id="cmax"></span><br>
-						<!-- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Institution credits are: Minimum – <span id="cmin"></span>, Maximum – <span id="cmax"></span> -->
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="inst_credits">Institution credits are: Minimum – <span id="ucmin"></span>, Maximum – <span id="ucmax"></span></span>
 						</p></div>
 					<div class="col-lg-3 cnote" style="margin-top: 20px; display: none"><a class="btn btn-primary btn-sm pull-right" href="#" data-toggle="modal" data-target="#creditsModal">Define Your Own Credits</a></div>
 					<div class="col-lg-12">
@@ -47,7 +47,8 @@
 							<select class="custom-select" name="branch_name" id="branches" required>
 								<option value="">Branch</option>
 							</select>
-						</div>	
+							<small style="color: red;">Didn’t find the Branch what you are looking for? <a href="javascript:void(0)" data-toggle="modal" data-target="#branchModal">Click here</a> to add New Branch</small>	
+						</div>
 					</div>
 					
 					<div class="col-lg-12">
@@ -61,8 +62,8 @@
 						</div>
 					</div>
 					<div class="col-md-12">
-						<input type="button" class="btn btn-info pull-left new_course_category" data-toggle="modal" data-target="#myModal" value="Add New Course Catergories" style="display:none">
-						<input type="button" class="btn btn-primary pull-right" id="gotoWeightage" value="Submit">
+						<small style="color: red; display:none;" class="new_course_category">Didn’t find the Course Catergory what you are looking for? <a href="javascript:void(0)" data-toggle="modal" data-target="#myModal">Click here</a> to add Course Catergory</small>
+						<input type="button" class="btn btn-primary pull-right" id="gotoWeightage" value="Save & Next">
 					</div>
 					
 				</div>
@@ -83,17 +84,18 @@
 						
 					</div>
 					<div class="col-lg-4">
-						<div id="piechart" style="width: 200px; height: 200px;"></div>
+						<!-- <div id="piechart" style="width: 200px; height: 200px;"></div> -->
 					</div>
 					<div class="col-lg-12" align="center">
 						<input type="hidden" name="bid" value="<? echo $bid ?>">
-						<input type="submit" value="Submit" class="btn btn-primary">
+						<input type="submit" value="Save & Next" class="btn btn-primary">
 					</div>
 				</div>
 			</form>	
 		</div>
 	</div>
 </div>
+
 <input type="hidden" class="weightagelabel">
 
 <div id="creditsModal" class="modal fade" role="dialog">
@@ -171,6 +173,32 @@
   </div>
 </div>
 
+<div id="popupModal" class="modal fade" role="dialog">
+  <div class="modal-dialog modal-lg">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header" style="display:block">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Instructions</h4>
+      </div>
+      <div class="modal-body">
+        <p style="font-align: justify; color: black"><strong>Note: </strong>
+			Under Graduate Degree Courses in EMERGING / MULTIDISCIPLINARY AREAS shall be allowed as specialization from the same department. The minimum additional Credits for such Courses shall be in the range of 18-20 (including credit transferred from the SWAYAM platform) and the same shall be mentioned in the degree, as specialization in that particular area. For example, doing extra credits for Robotics in Mechanical Engineering shall earn B.E./B.Tech. (Hons.) Mechanical Engineering with specialization in Robotics.<br>
+			Minor specialization in EMERGING/ MULTIDISCIPLINARY AREAS in Under Graduate Degree Courses may be allowed where a student of another Department shall take the minimum additional Credits in the range of 18-20 and get a degree with minor from another Department.
+		</p>
+		<p style="font-align: justify; color: black">
+		<strong>Disclaimer: </strong>
+		Areas in which Minor Degree/Hons. may be offered are numerous. It is up to the Universities with the help of their Academic Board/Council to decide whether Minor Degree/Hons. is to be offered or not in any particular area, which is not mentioned above. AICTE approval is not required for offering Minor Degree/Hons. in any such area, however the criteria that “Minor Degree or Hons. will cumulatively require additional 18 to 20 credits in the specified area in addition to the credits essential for obtaining the Under Graduate Degree in Major Discipline (i.e. 160 credits)”
+		To maintain the quality of Education, 60% of the eligible courses in any Technical Institution shall be accredited in the next TWO (2) years’ time, else EoA shall not be issued by the Council.
+
+		</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <? $this->load->view( "front_common/footer" ) ?>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
@@ -178,6 +206,10 @@
 </script>
 
 <script type="text/javascript">
+
+	$(document).ready(function(){
+		$("#popupModal").modal("show")
+	})
 
 	$("#updateCredits").submit(function(e){
 		
@@ -212,6 +244,10 @@
 		e.preventDefault();
 		var course = $("#courses").val();
 		var branch = $("#new_branch_name").val();
+		if(course === ""){
+			alert("Please Select Course.");
+			return false;	
+		}
 
 		$.ajax({
 			type: "post",
@@ -410,15 +446,28 @@
 		getBranches();
 		var min = $('option:selected', this).attr('cmin');
 		var max = $('option:selected', this).attr('cmax');
+		var umin = $('option:selected', this).attr('ucmin');
+		var umax = $('option:selected', this).attr('ucmax');
 
 		if($(this).val() == ""){
 			$(".cnote").hide();
 			$("#cmin").html("");
 			$("#cmax").html("");
+			$("#ucmin").html("");
+			$("#ucmax").html("");
 		}else{
 			$(".cnote").show();
 			$("#cmin").html(min);
 			$("#cmax").html(max);
+			$("#ucmin").html(umin);
+			$("#ucmax").html(umax);
+			$("#min_credits").val(umin);
+			$("#max_credits").val(umax);
+			if(umin === ""){
+				$("#inst_credits").hide();
+			}else{
+				$("#inst_credits").show();
+			}
 		}
 		
 		$('#sub_cats').bootstrapDualListbox('refresh', true);
@@ -436,9 +485,9 @@
 
 		if(id == "new"){
 			$("#new_branch_name").val("");
-			$("#branchModal").modal('show');
+			// $("#branchModal").modal('show');
 		}else{
-			$("#branchModal").modal('hide');
+			// $("#branchModal").modal('hide');
 		}
 		
 	}) 
@@ -538,7 +587,6 @@
 			dataType: "json",
 			url : "<? echo base_url('ajax/getWeightages') ?>",
 			success : function(data){
-//				console.log(data);
 				var course = $('#courses option:selected').attr('coname');
 				var branch_name = $("#branches").val();
 				
@@ -597,13 +645,26 @@
 		var sid = $(this).attr("subid");
 		var weightage = $(this).val();
 		var courses = $("#courses").val();
+		var sub_categories = [];
+		
+		$("select[name='sub_categories[]']").map(function(){
+			sub_categories.push($(this).val());
+		})
+
+		var weightage1 = $("input[name='weightage[]']")
+              .map(function(){return $(this).val();}).get();
 		
 		$.ajax({
 			type: "post",
-			data: {weightage:weightage,cid:courses},
+			data: {weightage: weightage,totalWeightage: weightage1,cid: courses, sub_categories: sub_categories},
+			dataType : "json",
 			url: "<? echo base_url('ajax/getCreditweightage') ?>",
 			success: function(data){
-				$(".assignCredits-"+sid).html(data);
+
+				for (var key of Object.keys(data.tWeightages)) {
+					console.log(key + " -> " + data.tWeightages[key])
+					$(".assignCredits-"+key).html(data.tWeightages[key]);
+				}
 
 				var options = [],
 					option;
@@ -623,7 +684,7 @@
 					}
 				}
 
-				google.charts.load('current', {'packages':['corechart']});
+				/* google.charts.load('current', {'packages':['corechart']});
 				google.charts.setOnLoadCallback(drawChart);
 
 				function drawChart() {
@@ -636,7 +697,7 @@
 
 					var chart = new google.visualization.PieChart(document.getElementById('piechart'));
 					chart.draw(data, options);
-				}
+				} */
 
 			}
 		})
@@ -646,7 +707,7 @@
 
 		var totalWeightage = 0;
 		$.each(weightage,function(){totalWeightage+=parseFloat(this) || 0;});
-		$(".selWeightage").html('<b>'+(Math.round(totalWeightage*10)/10).toFixed(1)+" %</b>");
+		$(".selWeightage").html('<b>'+totalWeightage+"</b>");
 		
 	})
 	

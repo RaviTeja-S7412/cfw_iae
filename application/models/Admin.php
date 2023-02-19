@@ -26,8 +26,13 @@ class Admin extends CI_Model{
 			$max_credits = $icdata->max_credits;
 		}
 
-		$max_weightage = round(($min_credits/100)*$weightage);
-		$min_weightage = round(($max_credits/100)*$weightage);
+		// $max_weightage = round(($min_credits/100)*$weightage);
+		// $min_weightage = round(($max_credits/100)*$weightage);
+		$max_weightage = round(($weightage/100)*$min_credits);
+		$min_weightage = round(($weightage/100)*$max_credits);
+
+		// $max_weightage = round(($weightage/$max_weightage)*100);
+		// $min_weightage = round(($weightage/$min_weightage)*100);
 		
 		$wc = ["max_weightage"=>$max_weightage,"min_weightage"=>$min_weightage];
 		$data = ($weightage != "") ? $wc : [];
