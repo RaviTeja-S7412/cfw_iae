@@ -48,7 +48,7 @@
 					<p class="mb-0 text-dark p-1 ml-auto">
 					  <b style="font-weight: 700">Credits Assigned:</b> <b class="totalCredits"><? echo $totalCredits ?></b>
 					</p>
-					<a target="_blank" href="<? echo base_url('dashboard/downloadsemesterPdf/'.$this->input->get('bid')) ?>"><i class="fa fa-download downloadPdf pull-right mt-1 ml-3" data-toggle="tooltip" title="Download PDF" style="cursor: pointer;font-size: 22px;"></i></a>
+					<i class="fa fa-download downloadPdf pull-right mt-1 ml-3" onClick="printDiv()" data-toggle="tooltip" title="Download PDF" style="cursor: pointer;font-size: 22px;"></i>
 				</div>
        		</div>
         <? 
@@ -75,10 +75,22 @@
 				<tbody>
 				  
 				<? 
-						
+
+					$ideal_credits = [];
+					$lecture_hours_per_week = [];
+					$tutorial_hours_per_week = [];
+					$lab_hours_per_week = [];
+					$total_credits = [];
 					foreach($semesters as $sk => $sub){
 
 						if($sub['semester_name'] == $sc){
+
+							array_push($ideal_credits, $sub['ideal_credits']);
+							array_push($lecture_hours_per_week, $sub['lecture_hours_per_week']);
+							array_push($tutorial_hours_per_week, $sub['tutorial_hours_per_week']);
+							array_push($lab_hours_per_week, $sub['lab_hours_per_week']);
+							array_push($total_credits, $sub['total_credits']);
+
 						
 				?>
 					  <tr>
@@ -91,7 +103,15 @@
 						<td><? echo $sub['total_credits'] ?></td>
 					  </tr>
 				<? }} ?>
-					  
+					 <tr>
+					 	<td></td>
+						<td>Total</td>
+						<td><? echo array_sum($ideal_credits) ?></td>
+						<td><? echo array_sum($lecture_hours_per_week) ?></td>
+						<td><? echo array_sum($tutorial_hours_per_week) ?></td>
+						<td><? echo array_sum($lab_hours_per_week) ?></td>
+						<td><? echo array_sum($total_credits) ?></td>
+					</tr>  
 				</tbody>
 			  </table>
 			  <br>

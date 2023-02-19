@@ -189,7 +189,7 @@
 		</p>
 		<p style="font-align: justify; color: black">
 		<strong>Disclaimer: </strong>
-		Areas in which Minor Degree/Hons. may be offered are numerous. It is up to the Universities with the help of their Academic Board/Council to decide whether Minor Degree/Hons. is to be offered or not in any particular area, which is not mentioned above. AICTE approval is not required for offering Minor Degree/Hons. in any such area, however the criteria that “Minor Degree or Hons. will cumulatively require additional 18 to 20 credits in the specified area in addition to the credits essential for obtaining the Under Graduate Degree in Major Discipline (i.e. 160 credits)”
+		Areas in which Minor Degree/Hons. may be offered are numerous. It is up to the Universities with the help of their Academic Board/Council to decide whether Minor Degree/Hons. is to be offered or not in any particular area, which is not mentioned above. AICTE approval is not required for offering Minor Degree/Hons. in any such area, however the criteria that “Minor Degree or Hons. will cumulatively require additional 18 to 20 credits in the specified area in addition to the credits essential for obtaining the Under Graduate Degree in Major Discipline (i.e. 160 credits)”<br><br>
 		To maintain the quality of Education, 60% of the eligible courses in any Technical Institution shall be accredited in the next TWO (2) years’ time, else EoA shall not be issued by the Council.
 
 		</p>

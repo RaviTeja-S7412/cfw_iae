@@ -16,11 +16,11 @@
 
 	<div class="content1">
       <div class="container">
-        <h4>Select Subjects</h4>
+        <h4>Select Course</h4>
        <!-- <form method="post" id="addSubjects" action="#<? //echo base_url("dashboard/insertSubjects") ?>"> -->
         <form method="post" id="addSubjects">
 			<div class="col-lg-12 card-col">
-				<a href="<? echo base_url('create-design') ?><? echo $branch_id ? "?bid=$branch_id" : '' ?>"><i class="fa fa-arrow-left backFields pull-left" style="cursor: pointer; font-size:22px"></i></a>
+				<div style="margin-bottom: 30px"><a href="<? echo base_url('create-design') ?><? echo $branch_id ? "?bid=$branch_id" : '' ?>"><i class="fa fa-arrow-left backFields pull-left" style="cursor: pointer; font-size:22px;"></i></a></div>
 
 				<? if(count($sub_categories) > 0){ 
 					foreach($sub_categories as $key => $sc){
@@ -31,9 +31,9 @@
 						$exOpenelectivedata = json_decode($ubranch_data->open_electives)->$sc;
 						
 				?>
-						
+					<hr style="border: 1px solid #000" />	
 					<h5 style="text-align: center; margin-top: 20px"><? echo $scdata->category_name ?></h5>
-					<hr />
+					<hr style="border: 1px solid #000" />
 						<select multiple="multiple" name="subjects-<? echo $sc ?>[]" id="subjects-<? echo $sc ?>" title="duallistbox_demo1[]">
 						<?
 							$this->db->select("tbl_subjects.id,tbl_subjects.subject_name");

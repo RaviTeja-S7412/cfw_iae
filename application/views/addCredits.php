@@ -26,7 +26,7 @@
 
     <div class="content1">
       <div class="container">
-       	<h4> (<? echo $program->program_name." - ".$course->course_name." - ".$this->db->get_where("tbl_branches",["id"=>$branch_data->branch_name])->row()->branch_name ?>) <span class="pull-right"><a href="#" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#creditsModal">Define Your Own Credits</a></span></h4>
+       	<h4> <? echo $program->program_name." - ".$course->course_name." - ".$this->db->get_where("tbl_branches",["id"=>$branch_data->branch_name])->row()->branch_name ?> <span class="pull-right"><a href="#" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#creditsModal">Define Your Own Credits</a></span></h4>
         <div class="col-lg-12 card-col">
         <? if($ref == "view"){ ?>
 			 <a href="<? echo base_url('view-curriculum-designs') ?>">
@@ -44,7 +44,7 @@
               <b style="font-weight: 700">Max Credits:</b> <b><? echo $max_credits ?></b>
             </p>
             <p class="mb-0 text-dark p-1 ml-auto">
-              <b style="font-weight: 700">Total Credits:</b> <b class="totalCredits"><? echo $totalCredits ?></b>
+              <b style="font-weight: 700" class="totalCredits">Total Credits: <? echo $totalCredits ?></b>
             </p>
           </div>
           <form method="post" id="addCredits">
@@ -54,7 +54,7 @@
 				$uWeightage = round($weigh/array_sum(json_decode($branch_data->weightage, true))*100);
 				$w = $weigtages[$sc];
 		?>
-			  <h6><strong><? echo $scat->category_name ?> (Weightage: <? echo $uWeightage." %" ?>) (Credits: <? echo $weigh ?>, Added: <b class="weightage_added-<? echo $sc ?>"><? echo $scatcredits[$sc] ?></b>)</strong></h6>
+			  <h6><strong><? echo $scat->category_name ?> <br>(Weightage: <? echo $uWeightage." %" ?>) (Credits: <? echo $weigh ?>, Added: <b class="weightage_added-<? echo $sc ?>"><? echo $scatcredits[$sc] ?></b>)</strong></h6>
 			  <table class="table text-center table-bordered" style="font-size: 14px">
 				<thead class="thead-dark">
 				  <tr>
@@ -70,8 +70,8 @@
 				<tbody>
 			  
 			  	<input type="hidden" name="credit_weightage-<? echo $sc ?>" id="credit_weightage-<? echo $sc ?>" value="<? echo $weigh ?>">
-			  	<input type="hidden" name="max_weightage-<? echo $sc ?>" id="max_weightage-<? echo $sc ?>" value="<? echo $w["max_weightage"] ?>">
-			  	<input type="hidden" name="min_weightage-<? echo $sc ?>" id="min_weightage-<? echo $sc ?>" value="<? echo $w["min_weightage"] ?>">
+			  	<input type="hidden" name="max_weightage-<? echo $sc ?>" id="max_weightage-<? echo $sc ?>" value="<? echo $max_credits ?>">
+			  	<input type="hidden" name="min_weightage-<? echo $sc ?>" id="min_weightage-<? echo $sc ?>" value="<? echo $min_credits ?>">
 			  	<input type="hidden" name="category_name-<? echo $sc ?>" id="category_name-<? echo $sc ?>" value="<? echo $scat->category_name ?>">
 				  
 				<? 
@@ -455,6 +455,22 @@
 			$.each(subcatValues1,function(){subcatTotal1+=parseFloat(this) || 0;});
 			
 			$(".weightage_added-"+subid).html(subcatTotal1);
+
+			var  totalCreditvaluesarr1 = [];
+			
+			<? foreach($sub_categories as $key => $sc1){ ?>
+			
+				var subcatValues12 = $("input[name='total_credits-<? echo $sc1 ?>[]']")
+				.map(function(){return $(this).val();}).get();
+			
+				totalCreditvaluesarr1.push(...subcatValues12);
+			
+			<? } ?>
+			
+			var creditsTotal1 = 0;
+			$.each(totalCreditvaluesarr1,function(){creditsTotal1+=parseFloat(this) || 0;});
+			$(".totalCredits").css('color','red');
+			$(".totalCredits").html('Total Credits: '+creditsTotal1)
 			
 			return false;
 		}
@@ -474,6 +490,16 @@
 		
 		var creditsTotal = 0;
 		$.each(totalCreditvaluesarr,function(){creditsTotal+=parseFloat(this) || 0;});
+
+		if(creditsTotal < min_weightage){
+			$(".totalCredits").css('color','orange');
+		}else if(parseFloat(creditsTotal) >= parseFloat(min_weightage) && parseFloat(creditsTotal) <= parseFloat(max_weightage)){
+			$(".totalCredits").css('color','green');
+		}else if(creditsTotal > max_weightage){
+			$(".totalCredits").css('color','red');
+		}
+
+		$(".totalCredits").html('Total Credits: '+creditsTotal)
 		
 		if(subcatTotal > max_weightage && min_weightage < subcatTotal){
 			swal(
@@ -483,8 +509,6 @@
 			);
 			return false;
 		}
-		
-		$(".totalCredits").html(creditsTotal)
 		
 	})
 	
