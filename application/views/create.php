@@ -68,7 +68,7 @@
 					
 				</div>
 
-				<div class="row" id="selectWeightage" style="display: none">
+				<div class="row" id="selectWeightage" style="display: <? echo $this->input->get("bid") == "" ? 'none': 'block' ?>">
 					<div class="col-lg-12 ml-auto d-flex">
 						<i class="fa fa-arrow-left fa-2x backFields pull-left" style="cursor: pointer"></i>
 						<p class="mb-0 text-dark p-1 ml-auto"><b style="font-weight: 700;">Total Percentage:</b> <b>100 %</b>&nbsp;&nbsp;<b style="font-weight: 700;">Total Credits:</b> <b class="courseCredits"> <? echo ($branch_data->min_credits != "") ? "($branch_data->min_credits - $branch_data->max_credits)" : '' ?> </b></p>
@@ -180,7 +180,7 @@
     <div class="modal-content">
       <div class="modal-header" style="display:block">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Instructions</h4>
+        <h4 class="modal-title">AICTE Norms and Requirement</h4>
       </div>
       <div class="modal-body">
         <p style="font-align: justify; color: black"><strong>Note: </strong>
@@ -258,6 +258,8 @@
 				$("#branchModal").modal('hide');
 				if(data.status == "success"){
 					getBranches(data.branch_id)
+					getSubcategories(data.branch_id, course)
+					$(".new_course_category").show();
 				}
 			},
 			error: function(data){

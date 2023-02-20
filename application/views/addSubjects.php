@@ -1,6 +1,10 @@
 <? 
 	$this->load->view("front_common/header"); 
 	$branch_id = $this->input->get("bid");
+
+	$branch_data = $this->db->get_where("tbl_institute_curriculum_design",["branch_id"=>$branch_id])->row();
+	$program = $this->db->get_where("tbl_programs",["id"=>$branch_data->program])->row();
+	$course = $this->db->get_where("tbl_courses",["id"=>$branch_data->course])->row();
 ?>
 
 <style>
@@ -16,7 +20,8 @@
 
 	<div class="content1">
       <div class="container">
-        <h4>Select Course</h4>
+        <h4 align="center"><? echo $program->program_name." - ".$course->course_name ?></h4>
+        <h5>Select Course</h5>
        <!-- <form method="post" id="addSubjects" action="#<? //echo base_url("dashboard/insertSubjects") ?>"> -->
         <form method="post" id="addSubjects">
 			<div class="col-lg-12 card-col">

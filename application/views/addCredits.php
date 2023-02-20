@@ -44,7 +44,13 @@
               <b style="font-weight: 700">Max Credits:</b> <b><? echo $max_credits ?></b>
             </p>
             <p class="mb-0 text-dark p-1 ml-auto">
-              <b style="font-weight: 700" class="totalCredits">Total Credits: <? echo $totalCredits ?></b>
+              <b style="font-weight: 700; color: <? if($totalCredits < $min_credits){
+				echo 'orange';
+			  }elseif($totalCredits >= $min_credits && $totalCredits <= $max_credits){
+				echo 'green';
+			  }elseif($totalCredits > $max_credits){
+				echo 'red';
+			  } ?>" class="totalCredits">Total Credits: <? echo $totalCredits ?></b>
             </p>
           </div>
           <form method="post" id="addCredits">
@@ -54,7 +60,15 @@
 				$uWeightage = round($weigh/array_sum(json_decode($branch_data->weightage, true))*100);
 				$w = $weigtages[$sc];
 		?>
-			  <h6><strong><? echo $scat->category_name ?> <br>(Weightage: <? echo $uWeightage." %" ?>) (Credits: <? echo $weigh ?>, Added: <b class="weightage_added-<? echo $sc ?>"><? echo $scatcredits[$sc] ?></b>)</strong></h6>
+			  <h6><strong><? echo $scat->category_name ?> <br>(Weightage: <? echo $uWeightage." %" ?>) (Credits: <? echo $weigh ?>,<b class="weightage_added-<? echo $sc ?>" style="color: <? 
+			  	if($scatcredits[$sc] < $weigh){
+					echo 'orange';
+				}else if($scatcredits[$sc] == $weigh){
+					echo 'green';
+				}else if($scatcredits[$sc] > $weigh){
+					echo 'red';
+				}
+			  ?>"> Added: <? echo $scatcredits[$sc] ?></b>)</strong></h6>
 			  <table class="table text-center table-bordered" style="font-size: 14px">
 				<thead class="thead-dark">
 				  <tr>
@@ -76,6 +90,12 @@
 				  
 				<? 
 					$subjects = json_decode($branch_data->subjects)->$sc;
+
+					$ideal_credits = [];
+					$lecture_hours_per_week = [];
+					$tutorial_hours_per_week = [];
+					$lab_hours_per_week = [];
+					$total_credits = [];
 						
 					foreach($subjects as $sk => $sub){
 						
@@ -83,6 +103,12 @@
 						$sdata = $this->db->get_where("tbl_subjects",["id"=>$sub])->row();
 
 						$creditsData = json_decode($branch_data->credits)->$sc;
+
+						array_push($ideal_credits, $sdata->ideal_credits);
+						array_push($lecture_hours_per_week, $creditsData->lecture_hours_per_week[$sk]);
+						array_push($tutorial_hours_per_week, $creditsData->tutorial_hours_per_week[$sk]);
+						array_push($lab_hours_per_week, $creditsData->lab_hours_per_week[$sk]);
+						array_push($total_credits, $creditsData->total_credits[$sk]);
 				?>
 					  <tr>
 						<th scope="row" style="text-align: left"><? echo $sdata->subject_name; ?></th>
@@ -102,6 +128,15 @@
 						</td>
 					  </tr>
 				<? } ?>
+				<tr>
+					<td class="pull-right"><strong>Total</strong></td>
+					<td style="text-align: left"><? echo array_sum($ideal_credits) ?></td>
+					<td style="text-align: left"><? echo array_sum($lecture_hours_per_week) ?></td>
+					<td style="text-align: left"><? echo array_sum($tutorial_hours_per_week) ?></td>
+					<td style="text-align: left"><? echo array_sum($lab_hours_per_week) ?></td>
+					<td style="text-align: left"><? echo array_sum($total_credits) ?></td>
+					<td></td>
+				</tr>
 					  
 				</tbody>
 			  </table>
@@ -413,6 +448,31 @@
 		}
 		
 		if(subcatTotal > credit_weightage){
+
+			var  totalCreditvaluesarr1 = [];
+			
+			<? foreach($sub_categories as $key => $sc1){ ?>
+			
+				var subcatValues12 = $("input[name='total_credits-<? echo $sc1 ?>[]']")
+				.map(function(){return $(this).val();}).get();
+			
+				totalCreditvaluesarr1.push(...subcatValues12);
+			
+			<? } ?>
+			
+			var creditsTotal1 = 0;
+			$.each(totalCreditvaluesarr1,function(){creditsTotal1+=parseFloat(this) || 0;});
+			$(".totalCredits").css('color','red');
+			$(".totalCredits").html('Total Credits: '+creditsTotal1)
+
+			var subcatValues1 = $("input[name='total_credits-"+subid+"[]']")
+              .map(function(){return $(this).val();}).get();
+
+			var subcatTotal1 = 0;
+			$.each(subcatValues1,function(){subcatTotal1+=parseFloat(this) || 0;});
+			$(".weightage_added-"+subid).css('color','red');
+			$(".weightage_added-"+subid).html('Added: '+subcatTotal1);
+
 			swal(
 			  '',
 			  'Total value of Credits are not equal to given credits please modify credits for '+category,
@@ -446,36 +506,18 @@
 			var total1 = lc1+tc1+lac1;
 			
 			$(".getCredittotal-"+ref).val(total1);
-			
-			
-			var subcatValues1 = $("input[name='total_credits-"+subid+"[]']")
-              .map(function(){return $(this).val();}).get();
-
-			var subcatTotal1 = 0;
-			$.each(subcatValues1,function(){subcatTotal1+=parseFloat(this) || 0;});
-			
-			$(".weightage_added-"+subid).html(subcatTotal1);
-
-			var  totalCreditvaluesarr1 = [];
-			
-			<? foreach($sub_categories as $key => $sc1){ ?>
-			
-				var subcatValues12 = $("input[name='total_credits-<? echo $sc1 ?>[]']")
-				.map(function(){return $(this).val();}).get();
-			
-				totalCreditvaluesarr1.push(...subcatValues12);
-			
-			<? } ?>
-			
-			var creditsTotal1 = 0;
-			$.each(totalCreditvaluesarr1,function(){creditsTotal1+=parseFloat(this) || 0;});
-			$(".totalCredits").css('color','red');
-			$(".totalCredits").html('Total Credits: '+creditsTotal1)
-			
 			return false;
 		}
+
+		if(subcatTotal < credit_weightage){
+			$(".weightage_added-"+subid).css('color','orange');
+		}else if(parseFloat(subcatTotal) == parseFloat(credit_weightage)){
+			$(".weightage_added-"+subid).css('color','green');
+		}else if(subcatTotal > credit_weightage){
+			$(".weightage_added-"+subid).css('color','red');
+		}
 		
-		$(".weightage_added-"+subid).html(subcatTotal);
+		$(".weightage_added-"+subid).html('Added: '+subcatTotal);
 
 		var  totalCreditvaluesarr = [];
 		
