@@ -219,14 +219,14 @@ class Dashboard extends CI_Controller {
 		$program = $this->db->get_where("tbl_programs",["id"=>$data["branch_data"]->program])->row();
 		$course = $this->db->get_where("tbl_courses",["id"=>$data["branch_data"]->course])->row();
 
-		$html = '<div style="font-family:helvetica; width:70%; margin:auto; padding:10px;">
+		$html = '
+		<div style="font-family:helvetica; width:70%; margin:auto; padding:10px;">
 		<div class="container">
-			 <h4 style="text-align:center; font-size: 22px;">('.$program->program_name." - ".$course->course_name." - ".$this->db->get_where("tbl_branches",["id"=>$data["branch_data"]->branch_name])->row()->branch_name.')</h4>
+			<h4 style="text-align:center; font-size: 22px;">'.$inst->institute_name.'</h4>
+			 <h4 style="text-align:center; font-size: 22px;">'.$program->program_name."<br>".$course->course_name."<br>".$this->db->get_where("tbl_branches",["id"=>$data["branch_data"]->branch_name])->row()->branch_name.'</h4>
 		  <div class="col-lg-12 card-col">
 		  			<div>
-					  <ul style="font-size:14px; width:60%; list-style:none; display:inline-block;margin-left:auto;">
-					  	<span><b style="font-weight: 700;">Min Credits: '.$min_credits.'</b></span>
-					  	<span><b style="font-weight: 700">Max Credits: '.$max_credits.'</b></span>
+					  <ul style="font-size:14px; width:28%; list-style:none; display:inline-block;margin-left:auto;">
 					  	<span><b style="font-weight: 700">Credits Assigned: '.$totalCredits.'</b></span>
 					  </ul>
 				 	</div>';
@@ -237,12 +237,12 @@ class Dashboard extends CI_Controller {
 				  $uWeightage = round($weigh/array_sum(json_decode($data["branch_data"]->weightage, true))*100);
 				  $w = $weigtages[$sc];
 			
-				  $html .= '<h4 style="font-size: 15px;"><strong>'.$scat->category_name.' (Weightage: '.$uWeightage." %".') (Credits: '.$weigh.', Added: <b class="weightage_added-'.$sc.'">'.$scatcredits[$sc].'</b>)</strong></h4>
-				<table style="font-size: 14px;">
+				  $html .= '<h4 style="font-size: 15px;"><strong>'.$scat->category_name.' <br>(Weightage: '.$uWeightage." %".') (Credits: '.$weigh.', Added: <b class="weightage_added-'.$sc.'">'.$scatcredits[$sc].'</b>)</strong></h4>
+				<table style="font-size: 14px; border-collapse: collapse;">
 				  <thead>
 					<tr style="border:1px solid gray;">
-					  <th scope="col" style="border:1px solid gray;">Subject</th>
-					  <th scope="col" style="border:1px solid gray;">Ideal Credits</th>
+					  <th scope="col" style="border:1px solid gray;">Sl. No.</th>
+					  <th scope="col" style="border:1px solid gray;">Course</th>
 					  <th scope="col" style="border:1px solid gray;">Lecture Hours Per Week</th>
 					  <th scope="col" style="border:1px solid gray;">Tutorial Hours Per Week</th>
 					  <th scope="col" style="border:1px solid gray;">Practicals/ Lab Hours Per Week</th>
@@ -252,25 +252,43 @@ class Dashboard extends CI_Controller {
 				  </thead>
 				  <tbody>';
 					
-					  $subjects = json_decode($data["branch_data"]->subjects)->$sc;
+					$subjects = json_decode($data["branch_data"]->subjects)->$sc;
+
+					$lecture_hours_per_week = [];
+					$tutorial_hours_per_week = [];
+					$lab_hours_per_week = [];
+					$total_credits = [];
+						
+					foreach($subjects as $sk => $sub){
 						  
-					  foreach($subjects as $sk => $sub){
-						  
-						  $randomkey = random_string("alnum",10);
-						  $sdata = $this->db->get_where("tbl_subjects",["id"=>$sub])->row();
-  
-						  $creditsData = json_decode($data["branch_data"]->credits)->$sc;
+						$randomkey = random_string("alnum",10);
+						$sdata = $this->db->get_where("tbl_subjects",["id"=>$sub])->row();
+
+						$creditsData = json_decode($data["branch_data"]->credits)->$sc;
+						array_push($lecture_hours_per_week, $creditsData->lecture_hours_per_week[$sk]);
+						array_push($tutorial_hours_per_week, $creditsData->tutorial_hours_per_week[$sk]);
+						array_push($lab_hours_per_week, $creditsData->lab_hours_per_week[$sk]);
+						array_push($total_credits, $creditsData->total_credits[$sk]);
 				  
 						$html .= '<tr  style="border:1px solid gray;">
+						  <td scope="row" style="text-align: left; border:1px solid gray;">'.($sk+1).'</td>
 						  <td scope="row" style="text-align: left; border:1px solid gray;">'.$sdata->subject_name.'</td>
-						  <td  style="border:1px solid gray;">'.$sdata->ideal_credits.'</td>
-						  <td style="border:1px solid gray;">'.$creditsData->lecture_hours_per_week[$sk].'</td>
-						  <td style="border:1px solid gray;">'.$creditsData->tutorial_hours_per_week[$sk].'</td>
-						  <td style="border:1px solid gray;">'.$creditsData->lab_hours_per_week[$sk].'</td>
-						  <td style="border:1px solid gray;">'.$creditsData->total_credits[$sk].'</td>
-						  <td style="border:1px solid gray;">'.$this->db->get_where("tbl_semesters",["id"=>$creditsData->semesters[$sk]])->row()->semester_name.'</td>
+						  <td style="border:1px solid gray;text-align: center;">'.$creditsData->lecture_hours_per_week[$sk].'</td>
+						  <td style="border:1px solid gray;text-align: center;">'.$creditsData->tutorial_hours_per_week[$sk].'</td>
+						  <td style="border:1px solid gray;text-align: center;">'.$creditsData->lab_hours_per_week[$sk].'</td>
+						  <td style="border:1px solid gray;text-align: center;">'.$creditsData->total_credits[$sk].'</td>
+						  <td style="border:1px solid gray;text-align: center;">'.$this->db->get_where("tbl_semesters",["id"=>$creditsData->semesters[$sk]])->row()->semester_name.'</td>
 						</tr>';
 				   	}
+					$html .= '<tr>
+						<td style="border:1px solid gray;text-align: center;" class="pull-right"></td>
+						<td style="border:1px solid gray;text-align: center;" class="pull-right"><strong>Total</strong></td>
+						<td style="border:1px solid gray;text-align: center;">'.array_sum($lecture_hours_per_week).'</td>
+						<td style="border:1px solid gray;text-align: center;">'.array_sum($tutorial_hours_per_week).'</td>
+						<td style="border:1px solid gray;text-align: center;">'.array_sum($lab_hours_per_week).'</td>
+						<td style="border:1px solid gray;text-align: center;">'.array_sum($total_credits).'</td>
+						<td style="border:1px solid gray;text-align: center;"></td>
+					</tr>';
 						
 				$html .= '</tbody>
 				</table>

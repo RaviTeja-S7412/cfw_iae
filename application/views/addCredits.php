@@ -27,7 +27,7 @@
     <div class="content1">
       <div class="container">
        	<h4> <? echo $program->program_name." - ".$course->course_name." - ".$this->db->get_where("tbl_branches",["id"=>$branch_data->branch_name])->row()->branch_name ?> <span class="pull-right"><a href="#" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#creditsModal">Define Your Own Credits</a></span></h4>
-        <div class="col-lg-12 card-col">
+        <div class="col-lg-12 card-col" style="margin-top: 35px;">
         <? if($ref == "view"){ ?>
 			 <a href="<? echo base_url('view-curriculum-designs') ?>">
 				<i class="fa fa-arrow-left fa-2x backFields pull-right" data-toggle="tooltip" title="Back To Designs" style="cursor: pointer"></i>
