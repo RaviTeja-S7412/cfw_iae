@@ -30,7 +30,7 @@
 
     <div class="content1" id="content1">
       <div class="container">
-       	<h4>(<? echo $program->program_name." - ".$course->course_name." - ".$this->db->get_where("tbl_branches",["id"=>$branch_data->branch_name])->row()->branch_name ?>)</h4>
+       	<h4><? echo $program->program_name." - ".$course->course_name." - ".$this->db->get_where("tbl_branches",["id"=>$branch_data->branch_name])->row()->branch_name ?></h4>
         <div class="col-lg-12 card-col">
         	<div class="row mb-3">
 				<div class="col-lg-6">
@@ -61,11 +61,12 @@
 				$w = $weigtages[$sc];
 		?>
           
-			  <h6><strong><? echo $scat->category_name ?> (Weightage: <? echo $uWeightage." %" ?>) (Credits: <? echo $weigh ?>, Added: <b class="weightage_added-<? echo $sc ?>"><? echo $scatcredits[$sc] ?></b>)</strong></h6>
+			  <h6><strong><? echo $scat->category_name ?><br> (Weightage: <? echo $uWeightage." %" ?>) (Credits: <? echo $weigh ?>, Added: <b class="weightage_added-<? echo $sc ?>"><? echo $scatcredits[$sc] ?></b>)</strong></h6>
 			  <table id="example" class="table table-striped table-bordered" style="font-size: 14px">
 				<thead>
 				  <tr>
-					<th scope="col">Subject</th>
+					<th scope="col">Course</th>
+					<th scope="col">Course Code</th>
 					<th scope="col">Ideal Credits</th>
 					<th scope="col">Lecture Hours Per Week</th>
 					<th scope="col">Tutorial Hours Per Week</th>
@@ -78,16 +79,30 @@
 				  
 				<? 
 					$subjects = json_decode($branch_data->subjects)->$sc;
+
+					$ideal_credits = [];
+					$lecture_hours_per_week = [];
+					$tutorial_hours_per_week = [];
+					$lab_hours_per_week = [];
+					$total_credits = [];
 						
 					foreach($subjects as $sk => $sub){
 						
 						$randomkey = random_string("alnum",10);
 						$sdata = $this->db->get_where("tbl_subjects",["id"=>$sub])->row();
+						$cdata = $this->db->get_where("tbl_course_codes",["course_id"=>$sub,"institute_id"=>$this->session->userdata("institute_id")])->row();
 
 						$creditsData = json_decode($branch_data->credits)->$sc;
+
+						array_push($ideal_credits, $sdata->ideal_credits);
+						array_push($lecture_hours_per_week, $creditsData->lecture_hours_per_week[$sk]);
+						array_push($tutorial_hours_per_week, $creditsData->tutorial_hours_per_week[$sk]);
+						array_push($lab_hours_per_week, $creditsData->lab_hours_per_week[$sk]);
+						array_push($total_credits, $creditsData->total_credits[$sk]);
 				?>
 					  <tr>
 						<td scope="row" style="text-align: left"><? echo $sdata->subject_name; ?></td>
+						<td scope="row" style="text-align: left"><? echo $cdata->course_code; ?></td>
 						<td><? echo $sdata->ideal_credits ?></td>
 						<td><? echo $creditsData->lecture_hours_per_week[$sk] ?></td>
 						<td><? echo $creditsData->tutorial_hours_per_week[$sk] ?></td>
@@ -96,6 +111,16 @@
 						<td><? echo $this->db->get_where("tbl_semesters",["id"=>$creditsData->semesters[$sk]])->row()->semester_name; ?></td>
 					  </tr>
 				<? } ?>
+					<tr>
+						<td></td>
+						<td><strong>Total</strong></td>
+						<td><? echo array_sum($ideal_credits) ?></td>
+						<td><? echo array_sum($lecture_hours_per_week) ?></td>
+						<td><? echo array_sum($tutorial_hours_per_week) ?></td>
+						<td><? echo array_sum($lab_hours_per_week) ?></td>
+						<td><? echo array_sum($total_credits) ?></td>
+						<td></td>
+					</tr>
 					  
 				</tbody>
 			  </table>

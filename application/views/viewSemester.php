@@ -30,7 +30,7 @@
 
     <div class="content1" id="content1">
       <div class="container">
-       	<h4>(<? echo $program->program_name." - ".$course->course_name." - ".$this->db->get_where("tbl_branches",["id"=>$branch_data->branch_name])->row()->branch_name ?>)</h4>
+       	<h4><? echo $program->program_name." - ".$course->course_name." - ".$this->db->get_where("tbl_branches",["id"=>$branch_data->branch_name])->row()->branch_name ?></h4>
         <div class="col-lg-12 card-col">
         	<div class="row mb-3">
 				<div class="col-lg-6">
@@ -64,7 +64,8 @@
 				<thead>
 				  <tr>
 					<th scope="col">Subject Category</th>
-					<th scope="col">Subject</th>
+					<th scope="col">Course</th>
+					<th scope="col">Course Code</th>
 					<th scope="col">Ideal Credits</th>
 					<th scope="col">Lecture Hours Per Week</th>
 					<th scope="col">Tutorial Hours Per Week</th>
@@ -85,6 +86,8 @@
 
 						if($sub['semester_name'] == $sc){
 
+							$cdata = $this->db->get_where("tbl_course_codes",["course_id"=>$sub['subject_id'],"institute_id"=>$this->session->userdata("institute_id")])->row();
+
 							array_push($ideal_credits, $sub['ideal_credits']);
 							array_push($lecture_hours_per_week, $sub['lecture_hours_per_week']);
 							array_push($tutorial_hours_per_week, $sub['tutorial_hours_per_week']);
@@ -96,6 +99,7 @@
 					  <tr>
 						<td scope="row" style="text-align: left"><? echo $sub['subject_category']; ?></td>
 						<td scope="row" style="text-align: left"><? echo $sub['subject_name']; ?></td>
+						<td scope="row" style="text-align: left"><? echo $cdata->course_code; ?></td>
 						<td><? echo $sub['ideal_credits'] ?></td>
 						<td><? echo $sub['lecture_hours_per_week'] ?></td>
 						<td><? echo $sub['tutorial_hours_per_week'] ?></td>
@@ -104,6 +108,7 @@
 					  </tr>
 				<? }} ?>
 					 <tr>
+					 	<td></td>
 					 	<td></td>
 						<td>Total</td>
 						<td><? echo array_sum($ideal_credits) ?></td>

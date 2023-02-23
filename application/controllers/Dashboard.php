@@ -61,7 +61,7 @@ class Dashboard extends CI_Controller {
 				$subject_category_name = $this->db->get_where("tbl_subject_category",["id"=>$k])->row()->category_name; 
 				$sub_data = $this->db->get_where("tbl_subjects",["id"=>$subjects[$sk]])->row(); 
 				
-				$semesters[] = ["subject_category"=>$subject_category_name,"subject_name"=>$sub_data->subject_name,
+				$semesters[] = ["subject_id"=>$subjects[$sk],"subject_category"=>$subject_category_name,"subject_name"=>$sub_data->subject_name,
 				"ideal_credits"=>$sub_data->ideal_credits,"lecture_hours_per_week"=>$s->lecture_hours_per_week[$sk], "tutorial_hours_per_week"=>$s->tutorial_hours_per_week[$sk], "lab_hours_per_week"=>$s->lab_hours_per_week[$sk], "total_credits"=>$s->total_credits[$sk], "semester_name"=>$sem_name];
 			}
 
@@ -243,6 +243,7 @@ class Dashboard extends CI_Controller {
 					<tr style="border:1px solid gray;">
 					  <th scope="col" style="border:1px solid gray;">Sl. No.</th>
 					  <th scope="col" style="border:1px solid gray;">Course</th>
+					  <th scope="col" style="border:1px solid gray;">Course Code</th>
 					  <th scope="col" style="border:1px solid gray;">Lecture Hours Per Week</th>
 					  <th scope="col" style="border:1px solid gray;">Tutorial Hours Per Week</th>
 					  <th scope="col" style="border:1px solid gray;">Practicals/ Lab Hours Per Week</th>
@@ -263,6 +264,7 @@ class Dashboard extends CI_Controller {
 						  
 						$randomkey = random_string("alnum",10);
 						$sdata = $this->db->get_where("tbl_subjects",["id"=>$sub])->row();
+						$cdata = $this->db->get_where("tbl_course_codes",["course_id"=>$sub,"institute_id"=>$this->session->userdata("institute_id")])->row();
 
 						$creditsData = json_decode($data["branch_data"]->credits)->$sc;
 						array_push($lecture_hours_per_week, $creditsData->lecture_hours_per_week[$sk]);
@@ -273,6 +275,7 @@ class Dashboard extends CI_Controller {
 						$html .= '<tr  style="border:1px solid gray;">
 						  <td scope="row" style="text-align: left; border:1px solid gray;">'.($sk+1).'</td>
 						  <td scope="row" style="text-align: left; border:1px solid gray;">'.$sdata->subject_name.'</td>
+						  <td scope="row" style="text-align: left; border:1px solid gray;">'.$cdata->course_code.'</td>
 						  <td style="border:1px solid gray;text-align: center;">'.$creditsData->lecture_hours_per_week[$sk].'</td>
 						  <td style="border:1px solid gray;text-align: center;">'.$creditsData->tutorial_hours_per_week[$sk].'</td>
 						  <td style="border:1px solid gray;text-align: center;">'.$creditsData->lab_hours_per_week[$sk].'</td>
@@ -281,6 +284,7 @@ class Dashboard extends CI_Controller {
 						</tr>';
 				   	}
 					$html .= '<tr>
+						<td style="border:1px solid gray;text-align: center;" class="pull-right"></td>
 						<td style="border:1px solid gray;text-align: center;" class="pull-right"></td>
 						<td style="border:1px solid gray;text-align: center;" class="pull-right"><strong>Total</strong></td>
 						<td style="border:1px solid gray;text-align: center;">'.array_sum($lecture_hours_per_week).'</td>
@@ -300,7 +304,7 @@ class Dashboard extends CI_Controller {
 
 	
 	  $mpdf->WriteHTML($html);
-	  $mpdf->Output($inst->institute_name.".pdf","D");
+	  $mpdf->Output($inst->institute_name.".pdf","I");
 
 	}
 
@@ -504,6 +508,8 @@ class Dashboard extends CI_Controller {
 				unset($exCredits[$sub_id]);
 			}
 			
+			$subject_id = $this->input->post("subject_id");
+			$course_code = $this->input->post("course_code");
 			$lectures = $this->input->post("lecture_hours_per_week");
 			$tutorial = $this->input->post("tutorial_hours_per_week");
 			$lab = $this->input->post("lab_hours_per_week");
@@ -552,6 +558,7 @@ class Dashboard extends CI_Controller {
 				
 			}
 			
+			$course_codes = [];
 			foreach($subCats as $ssc){
 				if($exCredits[$ssc]){
 					$credits[$ssc] = $exCredits[$ssc];
@@ -560,6 +567,10 @@ class Dashboard extends CI_Controller {
 						$credits[$ssc] = ["lecture_hours_per_week"=>$lectures,"tutorial_hours_per_week"=>$tutorial,"lab_hours_per_week"=>$lab,"total_credits"=>$total,"semesters"=>$semesters];
 					}
 				}
+			}
+			
+			foreach($subject_id as $ski => $si){
+				$course_codes[] = ["course_id"=>$si, "institute_id"=>$this->session->userdata("institute_id"), "course_code"=>$course_code[$ski]];
 			}
 			
 		}else{

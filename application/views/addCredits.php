@@ -114,8 +114,8 @@
 					  <tr>
 						<th scope="row" style="text-align: left"><? echo $sdata->subject_name; ?></th>
 						<td>
-							<input type="text" class="form-control" name="course_code-<? echo $sc ?>[]" value="<? echo $this->db->get_where("tbl_course_codes",["course_id"=>$sdata->id,"institute_id"=>$this->session->userdata("institute_id")])->row()->course_code; ?>" required>
-							<input type="hidden" class="form-control" name="subject_id-<? echo $sc ?>[]" value="<? echo $sdata->id ?>" required>
+							<input type="text" class="form-control ucourse_code-<? echo $sc ?>" name="course_code-<? echo $sc ?>[]" value="<? echo $this->db->get_where("tbl_course_codes",["course_id"=>$sdata->id,"institute_id"=>$this->session->userdata("institute_id")])->row()->course_code; ?>" required>
+							<input type="hidden" class="form-control usubject_id-<? echo $sc ?>" name="subject_id-<? echo $sc ?>[]" value="<? echo $sdata->id ?>" required>
 						</td>
 						<td><input type="number" class="form-control" value="<? echo $sdata->ideal_credits ?>" readonly></td>
 						<td><input type="number" class="form-control getCreditvalue getCreditlecture-<? echo $randomkey ?> ugetCreditlecture-<? echo $sc ?>" ref="<? echo $randomkey ?>" name="lecture_hours_per_week-<? echo $sc ?>[]" subcat="<? echo $sc ?>" min="0" step="0.01" value="<? echo $creditsData->lecture_hours_per_week[$sk] ?>" <? echo ($ref == "view") ? 'readonly' : '' ?> required></td>
@@ -289,6 +289,20 @@
 				total_credits.push($(this).val());   
 			}    
 		});
+		
+		var subject_id = []; 
+		$(".usubject_id-"+uref).each(function(index,data) {
+			if($(this).val()){
+				subject_id.push($(this).val());   
+			}    
+		});
+		
+		var course_code = []; 
+		$(".ucourse_code-"+uref).each(function(index,data) {
+			if($(this).val()){
+				course_code.push($(this).val());   
+			}    
+		});
 
 		var g20 = total_credits.filter(v => +v > 20).map(Number)
 
@@ -329,7 +343,7 @@
 		
 		$.ajax({
 			type : "post",
-			data : {sub_id:uref,lecture_hours_per_week:lecture_hours_per_week,tutorial_hours_per_week:tutorial_hours_per_week,lab_hours_per_week:lab_hours_per_week,total_credits:total_credits,semester:semester,bid:<? echo $this->input->get("bid") ?>,subjectsCount:subjectsCount},
+			data : {sub_id:uref,lecture_hours_per_week:lecture_hours_per_week,tutorial_hours_per_week:tutorial_hours_per_week,lab_hours_per_week:lab_hours_per_week,total_credits:total_credits,semester:semester,bid:<? echo $this->input->get("bid") ?>,subjectsCount:subjectsCount, subject_id: subject_id, course_code:course_code},
 			dataType : "json",
 			url : "<? echo base_url('dashboard/insertCredits') ?>",
 			success : function(data){
