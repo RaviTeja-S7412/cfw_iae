@@ -565,8 +565,11 @@ class Dashboard extends CI_Controller {
 		}else{
 		
 			$totalCredits = 0;
+			$course_codes = [];
 			foreach($subCats as $sc){
 
+				$course_code = $this->input->post("course_code-$sc");
+				$subject_id = $this->input->post("subject_id-$sc");
 				$lectures = $this->input->post("lecture_hours_per_week-$sc");
 				$tutorial = $this->input->post("tutorial_hours_per_week-$sc");
 				$lab = $this->input->post("lab_hours_per_week-$sc");
@@ -576,6 +579,10 @@ class Dashboard extends CI_Controller {
 				$totalCredits += array_sum($total);
 
 				$credits[$sc] = ["lecture_hours_per_week"=>$lectures,"tutorial_hours_per_week"=>$tutorial,"lab_hours_per_week"=>$lab,"total_credits"=>$total,"semesters"=>$semesters];
+
+				foreach($subject_id as $ski => $si){
+					$course_codes[] = ["course_id"=>$si, "institute_id"=>$this->session->userdata("institute_id"), "course_code"=>$course_code[$ski]];
+				}
 
 			}
 
@@ -599,6 +606,20 @@ class Dashboard extends CI_Controller {
 			
 			$branch_name = $this->db->get_where("tbl_branches",["id"=>$bd->branch_name])->row()->branch_name;
 			$this->db->where("id",$bid)->update("tbl_institute_branches",["status"=>1]);
+
+			foreach($course_codes as $cc){
+				$ccData = ["course_id"=>$cc["course_id"], "institute_id"=>$this->session->userdata("institute_id"), "course_code"=>$cc['course_code']];
+
+				$ccCodeChk = $this->db->get_where("tbl_course_codes", ["course_id"=>$cc["course_id"], "institute_id"=>$this->session->userdata("institute_id")])->num_rows();
+
+				if($ccCodeChk > 0){
+					$this->db->where(["course_id"=>$cc["course_id"], "institute_id"=>$this->session->userdata("institute_id")])->update("tbl_course_codes", ["course_code"=>$cc['course_code']]);
+				}else{
+					$this->db->insert("tbl_course_codes",$ccData);
+				}
+
+			}
+
 			echo json_encode(["status"=>true,"msg"=>"Credits Added Successfully, Curriculum Design Successfully Created For $branch_name."]);
 			
 			$this->session->unset_userdata("branch_data");
@@ -705,10 +726,12 @@ class Dashboard extends CI_Controller {
 			$branch_data = json_decode($this->session->userdata("branch_data"));
 			
 			$weightages = [];
+			$course_category_codes = [];
 
 			foreach($branch_data->sub_cats as $k => $sc){
 
-				$weightages[$sc] = $branch_data->weightage[$k];;
+				$weightages[$sc] = $branch_data->weightage[$k];
+				$course_category_codes[] = ["course_category_id"=> $sc, "institute_id"=> $inst_id, "course_category_code"=>$branch_data->course_category_code[$k]];
 
 			}
 
@@ -737,9 +760,17 @@ class Dashboard extends CI_Controller {
 				if($bid){
 					unset($pdata["branch_id"]);
 					$pd = $this->db->where("branch_id",$bid)->update("tbl_institute_curriculum_design",$pdata);
+
+					foreach($course_category_codes as $ccc){
+						$this->db->where(["course_category_id"=> $ccc["course_category_id"], "institute_id"=> $ccc["institute_id"]])->update("tbl_course_category_codes",["course_category_code"=>$ccc["course_category_code"]]);
+					}
 				}else{
 					$pd = $this->db->insert("tbl_institute_curriculum_design",$pdata);
 					$lid = $this->db->insert_id();
+
+					foreach($course_category_codes as $ccc){
+						$this->db->insert("tbl_course_category_codes", $ccc);
+					}
 				}
 			
 				if($bid){

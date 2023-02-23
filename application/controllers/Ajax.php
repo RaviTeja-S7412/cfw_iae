@@ -138,11 +138,25 @@ class Ajax extends CI_Controller {
 		$tmin = [];
 		$totalWeigh = 0;
 		
-		$html .= '<div class="form-group row"><label class="col-sm-5" style="text-align:center;"><strong>Subject/Course Category</strong></label> <div class="col-sm-3"><label><strong>Credits</strong></label></div><div class="col-sm-4"><strong>Weightage in %</strong></div></div>';
+		$html .= '<div class="form-group row">
+					<label class="col-sm-5" style="text-align:center;">
+						<strong>Subject/Course Category</strong>
+					</label>
+					<div class="col-sm-2">
+						<label><strong>Category Code</strong></label>
+					</div>
+					<div class="col-sm-2">
+						<label><strong>Credits</strong></label>
+					</div>
+					<div class="col-sm-3">
+						<strong>Weightage in %</strong>
+					</div>
+				</div>';
 		
 		foreach($sub_cats as $key => $sc){
 		
 			$wt = $weightages[$sc["id"]];
+			$code = $this->db->get_where("tbl_course_category_codes",["course_category_id"=>$sc['id'], "institute_id"=> $this->session->userdata('institute_id')])->row();
 			
 			// $cw = $this->admin->getCreditweightage($wt,$cid);
 			// $max = $cw['max_weightage'];
@@ -151,7 +165,17 @@ class Ajax extends CI_Controller {
 			// if($max)
 				$credits = round($wt/array_sum($weightages)*100)." %";
 			
-			$html .= '<div class="form-group row"><label for="staticEmail" class="col-sm-5 col-form-label">'.$sc['cname'].'</label> <div class="col-sm-3"> <input type="text" class="form-control getWeightages" subid="'.$sc['id'].'" name="weightage[]"  placeholder="Credits" value="'.$wt.'" required/><input type="hidden" class="form-control" name="sub_cats[]" value="'.$sc['id'].'"/> </div><div class="col-sm-4 assignCredits-'.$sc['id'].'">'.$credits.'</div></div>';
+			$html .= '<div class="form-group row">
+						<label for="staticEmail" class="col-sm-5 col-form-label">'.$sc['cname'].'</label> 
+					<div class="col-sm-2"> 
+					  	<input type="text" class="form-control" name="course_category_code[]"  placeholder="Course Category Code" value="'.$code->course_category_code.'" required/>
+					</div>
+					<div class="col-sm-2"> 
+					  	<input type="text" class="form-control getWeightages" subid="'.$sc['id'].'" name="weightage[]"  placeholder="Credits" value="'.$wt.'" required/>
+						<input type="hidden" class="form-control" name="sub_cats[]" value="'.$sc['id'].'"/> 
+					</div>
+					<div class="col-sm-3 assignCredits-'.$sc['id'].'">'.$credits.'</div>
+					</div>';
 			
 			$tmax[] = $max;
 			$tmin[] = $min;
@@ -165,7 +189,7 @@ class Ajax extends CI_Controller {
 		
 		$tcredits = "<b>Credits:</b> ($totalMax - $totalMin)";
 		
-		$html .= '<div class="form-group row"><label for="staticEmail" class="col-sm-5 col-form-label"><strong>Total Credits</strong></label> <div class="col-sm-3 selWeightage col-form-label" style="text-align:left;"><b>'.$totalWeigh.'</b></div></div>';
+		$html .= '<div class="form-group row"><label for="staticEmail" class="col-sm-5 col-form-label"><strong>Total Credits</strong></label><div class="col-sm-2" style="text-align:left;"></div> <div class="col-sm-2 selWeightage col-form-label" style="text-align:left;"><b>'.$totalWeigh.'</b></div></div>';
 
 		$branch_data = $this->db->get_where("tbl_branches",["id"=>$this->input->post("branch")])->row();
 		

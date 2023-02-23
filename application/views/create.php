@@ -80,10 +80,10 @@
 					<div class="col-md-12">
 						<p style="margin-left: 48px;color: red;font-size: 14px;font-weight: 500;">Note: Minor variation is allowed as per the need of the respective discipline.</p>	
 					</div>
-					<div class="col-lg-8 subcategories_weightages">
+					<div class="col-lg-9 subcategories_weightages">
 						
 					</div>
-					<div class="col-lg-4">
+					<div class="col-lg-3">
 						<!-- <div id="piechart" style="width: 200px; height: 200px;"></div> -->
 					</div>
 					<div class="col-lg-12" align="center">

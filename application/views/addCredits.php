@@ -72,7 +72,8 @@
 			  <table class="table text-center table-bordered" style="font-size: 14px">
 				<thead class="thead-dark">
 				  <tr>
-					<th scope="col">Subject</th>
+					<th scope="col">Course</th>
+					<th scope="col">Course Code</th>
 					<th scope="col">Ideal Credits</th>
 					<th scope="col">Lecture Hours Per Week</th>
 					<th scope="col">Tutorial Hours Per Week</th>
@@ -112,6 +113,10 @@
 				?>
 					  <tr>
 						<th scope="row" style="text-align: left"><? echo $sdata->subject_name; ?></th>
+						<td>
+							<input type="text" class="form-control" name="course_code-<? echo $sc ?>[]" value="<? echo $this->db->get_where("tbl_course_codes",["course_id"=>$sdata->id,"institute_id"=>$this->session->userdata("institute_id")])->row()->course_code; ?>" required>
+							<input type="hidden" class="form-control" name="subject_id-<? echo $sc ?>[]" value="<? echo $sdata->id ?>" required>
+						</td>
 						<td><input type="number" class="form-control" value="<? echo $sdata->ideal_credits ?>" readonly></td>
 						<td><input type="number" class="form-control getCreditvalue getCreditlecture-<? echo $randomkey ?> ugetCreditlecture-<? echo $sc ?>" ref="<? echo $randomkey ?>" name="lecture_hours_per_week-<? echo $sc ?>[]" subcat="<? echo $sc ?>" min="0" step="0.01" value="<? echo $creditsData->lecture_hours_per_week[$sk] ?>" <? echo ($ref == "view") ? 'readonly' : '' ?> required></td>
 						<td><input type="number" class="form-control getCreditvalue getCredittutorial-<? echo $randomkey ?> ugetCredittutorial-<? echo $sc ?>" ref="<? echo $randomkey ?>" name="tutorial_hours_per_week-<? echo $sc ?>[]" subcat="<? echo $sc ?>" min="0" step="0.01" value="<? echo $creditsData->tutorial_hours_per_week[$sk] ?>" <? echo ($ref == "view") ? 'readonly' : '' ?> required></td>
@@ -130,6 +135,7 @@
 				<? } ?>
 				<tr>
 					<td class="pull-right"><strong>Total</strong></td>
+					<td style="text-align: left"></td>
 					<td style="text-align: left"><? echo array_sum($ideal_credits) ?></td>
 					<td style="text-align: left"><? echo array_sum($lecture_hours_per_week) ?></td>
 					<td style="text-align: left"><? echo array_sum($tutorial_hours_per_week) ?></td>
