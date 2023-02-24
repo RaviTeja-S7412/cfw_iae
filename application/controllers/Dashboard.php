@@ -334,7 +334,7 @@ class Dashboard extends CI_Controller {
 				$sub_data = $this->db->get_where("tbl_subjects",["id"=>$subjects[$sk]])->row(); 
 				
 				$semesters[] = ["subject_category"=>$subject_category_name,"subject_name"=>$sub_data->subject_name,
-				"ideal_credits"=>$sub_data->ideal_credits,"lecture_hours_per_week"=>$s->lecture_hours_per_week[$sk], "tutorial_hours_per_week"=>$s->tutorial_hours_per_week[$sk], "lab_hours_per_week"=>$s->lab_hours_per_week[$sk], "total_credits"=>$s->total_credits[$sk], "semester_name"=>$sem_name];
+				"ideal_credits"=>$sub_data->ideal_credits,"lecture_hours_per_week"=>$s->lecture_hours_per_week[$sk], "tutorial_hours_per_week"=>$s->tutorial_hours_per_week[$sk], "lab_hours_per_week"=>$s->lab_hours_per_week[$sk], "total_credits"=>$s->total_credits[$sk], "semester_name"=>$sem_name, "subject_id"=>$sub_data->id];
 			}
 
 		}
@@ -371,12 +371,11 @@ class Dashboard extends CI_Controller {
 
 		$html = '<div style="font-family:helvetica; width:70%; margin:auto; padding:10px;">
 		<div class="container">
-			 <h4 style="text-align:center; font-size: 22px;">('.$program->program_name." - ".$course->course_name." - ".$this->db->get_where("tbl_branches",["id"=>$data["branch_data"]->branch_name])->row()->branch_name.')</h4>
+			<h4 style="text-align:center; font-size: 22px;">'.$inst->institute_name.'</h4>
+			 <h4 style="text-align:center; font-size: 22px;">'.$program->program_name."<br>".$course->course_name."<br>".$this->db->get_where("tbl_branches",["id"=>$data["branch_data"]->branch_name])->row()->branch_name.'</h4>
 		  <div class="col-lg-12 card-col">
 		  			<div>
-					  <ul style="font-size:14px; width:60%; list-style:none; display:inline-block;margin-left:auto;">
-					  	<span><b style="font-weight: 700;">Min Credits: '.$min_credits.'</b></span>
-					  	<span><b style="font-weight: 700">Max Credits: '.$max_credits.'</b></span>
+					  <ul style="font-size:14px; width:28%; list-style:none; display:inline-block;margin-left:auto;">
 					  	<span><b style="font-weight: 700">Credits Assigned: '.$totalCredits.'</b></span>
 					  </ul>
 				 	</div>';
@@ -387,12 +386,12 @@ class Dashboard extends CI_Controller {
 					$w = $weigtages[$sc];
 			
 				  $html .= '<h4 style="font-size: 15px;"><strong>Semester - '.$sc.'</strong></h4>
-				<table style="font-size: 14px;">
+				<table style="font-size: 14px; border-collapse: collapse;">
 				  <thead>
 					<tr style="border:1px solid gray;">
 					  <th scope="col" style="border:1px solid gray;">Subject Category</th>
 					  <th scope="col" style="border:1px solid gray;">Subject</th>
-					  <th scope="col" style="border:1px solid gray;">Ideal Credits</th>
+					  <th scope="col" style="border:1px solid gray;">Subject Code</th>
 					  <th scope="col" style="border:1px solid gray;">Lecture Hours Per Week</th>
 					  <th scope="col" style="border:1px solid gray;">Tutorial Hours Per Week</th>
 					  <th scope="col" style="border:1px solid gray;">Practicals/ Lab Hours Per Week</th>
@@ -401,21 +400,42 @@ class Dashboard extends CI_Controller {
 				  </thead>
 				  <tbody>';
 					
+				  	$lecture_hours_per_week = [];
+					$tutorial_hours_per_week = [];
+					$lab_hours_per_week = [];
+					$total_credits = [];
 				  foreach($semesters as $sk => $sub){
 
 					if($sub['semester_name'] == $sc){
+
+						array_push($lecture_hours_per_week, $sub['lecture_hours_per_week']);
+						array_push($tutorial_hours_per_week, $sub['tutorial_hours_per_week']);
+						array_push($lab_hours_per_week, $sub['lab_hours_per_week']);
+						array_push($total_credits, $sub['total_credits']);
+
+						$cdata = $this->db->get_where("tbl_course_codes",["course_id"=>$sub['subject_id'],"institute_id"=>$this->session->userdata("institute_id")])->row();
 				  
 						$html .= '<tr  style="border:1px solid gray;">
 						  <td scope="row" style="text-align: left; border:1px solid gray;">'.$sub['subject_category'].'</td>
 						  <td scope="row" style="text-align: left; border:1px solid gray;">'.$sub['subject_name'].'</td>
-						  <td  style="border:1px solid gray;">'.$sub['ideal_credits'].'</td>
-						  <td style="border:1px solid gray;">'.$sub['lecture_hours_per_week'].'</td>
-						  <td style="border:1px solid gray;">'.$sub['tutorial_hours_per_week'].'</td>
-						  <td style="border:1px solid gray;">'.$sub['lab_hours_per_week'].'</td>
-						  <td style="border:1px solid gray;">'.$sub['total_credits'].'</td>
+						  <td scope="row" style="text-align: left; border:1px solid gray;">'.$cdata->course_code.'</td>
+						  <td style="border:1px solid gray;text-align: center;">'.$sub['lecture_hours_per_week'].'</td>
+						  <td style="border:1px solid gray;text-align: center;">'.$sub['tutorial_hours_per_week'].'</td>
+						  <td style="border:1px solid gray;text-align: center;">'.$sub['lab_hours_per_week'].'</td>
+						  <td style="border:1px solid gray;text-align: center;">'.$sub['total_credits'].'</td>
 						</tr>';
 				   	}
 				}
+
+				$html .= '<tr>
+							<td style="border:1px solid gray;text-align: center;"></td>
+							<td style="border:1px solid gray;text-align: center;"></td>
+							<td style="border:1px solid gray;text-align: center;">Total</td>
+							<td style="border:1px solid gray;text-align: center;text-align: center;">'.array_sum($lecture_hours_per_week).'</td>
+							<td style="border:1px solid gray;text-align: center;text-align: center;">'.array_sum($tutorial_hours_per_week).'</td>
+							<td style="border:1px solid gray;text-align: center;text-align: center;">'.array_sum($lab_hours_per_week).'</td>
+							<td style="border:1px solid gray;text-align: center;text-align: center;">'.array_sum($total_credits).'</td>
+						</tr>';
 						
 				$html .= '</tbody>
 				</table>
@@ -426,7 +446,7 @@ class Dashboard extends CI_Controller {
 	  </div>';
 
 	  $mpdf->WriteHTML($html);
-	  $mpdf->Output($inst->institute_name.".pdf","D");
+	  $mpdf->Output($inst->institute_name.".pdf","I");
 
 	}
 	

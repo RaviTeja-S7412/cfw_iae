@@ -48,7 +48,7 @@
 					<p class="mb-0 text-dark p-1 ml-auto">
 					  <b style="font-weight: 700">Credits Assigned:</b> <b class="totalCredits"><? echo $totalCredits ?></b>
 					</p>
-					<i class="fa fa-download downloadPdf pull-right mt-1 ml-3" onClick="printDiv()" data-toggle="tooltip" title="Download PDF" style="cursor: pointer;font-size: 22px;"></i>
+					<a target="_blank" href="<? echo base_url('dashboard/downloadsemesterPdf/'.$this->input->get('bid')) ?>"><i class="fa fa-download downloadPdf pull-right mt-1 ml-3" data-toggle="tooltip" title="Download Semester PDF" style="cursor: pointer;font-size: 22px;"></i></a>
 				</div>
        		</div>
         <? 
