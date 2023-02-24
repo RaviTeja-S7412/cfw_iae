@@ -304,7 +304,7 @@ class Dashboard extends CI_Controller {
 
 	
 	  $mpdf->WriteHTML($html);
-	  $mpdf->Output($inst->institute_name.".pdf","I");
+	  $mpdf->Output($inst->institute_name.".pdf","D");
 
 	}
 
@@ -446,7 +446,7 @@ class Dashboard extends CI_Controller {
 	  </div>';
 
 	  $mpdf->WriteHTML($html);
-	  $mpdf->Output($inst->institute_name.".pdf","I");
+	  $mpdf->Output($inst->institute_name.".pdf","D");
 
 	}
 	
