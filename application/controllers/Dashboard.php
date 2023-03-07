@@ -57,15 +57,18 @@ class Dashboard extends CI_Controller {
 
 			foreach($s->semesters as $sk => $sem){
 
-				$sem_name = $this->db->get_where("tbl_semesters",["id"=>$sem])->row()->semester_name; 
+				$sem_name = $this->db->get_where("tbl_semesters",["id"=>$sem])->row(); 
 				$subject_category_name = $this->db->get_where("tbl_subject_category",["id"=>$k])->row()->category_name; 
 				$sub_data = $this->db->get_where("tbl_subjects",["id"=>$subjects[$sk]])->row(); 
 				
 				$semesters[] = ["subject_id"=>$subjects[$sk],"subject_category"=>$subject_category_name,"subject_name"=>$sub_data->subject_name,
-				"ideal_credits"=>$sub_data->ideal_credits,"lecture_hours_per_week"=>$s->lecture_hours_per_week[$sk], "tutorial_hours_per_week"=>$s->tutorial_hours_per_week[$sk], "lab_hours_per_week"=>$s->lab_hours_per_week[$sk], "total_credits"=>$s->total_credits[$sk], "semester_name"=>$sem_name];
+				"ideal_credits"=>$sub_data->ideal_credits,"lecture_hours_per_week"=>$s->lecture_hours_per_week[$sk], "tutorial_hours_per_week"=>$s->tutorial_hours_per_week[$sk], "lab_hours_per_week"=>$s->lab_hours_per_week[$sk], "total_credits"=>$s->total_credits[$sk], "semester_name"=>$sem_name->semester_name, "semester_number"=>$sem_name->semester_number];
 			}
 
 		}
+
+		$semsort = array_column($semesters, 'semester_number');
+		array_multisort($semsort, SORT_ASC, $semesters);
 
 		$sids = array();
 		foreach ($semesters as $sm) {
@@ -140,7 +143,6 @@ class Dashboard extends CI_Controller {
 			$wdata = [];
 			$wdata["max_weightage"] = round(($min_credits/100)*$w);
 			$wdata["min_weightage"] = round(($max_credits/100)*$w);
-//			$wdata["sub_category"] = $data["sub_categories"][$k];
 			
 			$weigtages[$k] = $wdata;
 			
@@ -169,7 +171,7 @@ class Dashboard extends CI_Controller {
 	public function downloadPdf($bid){
 
 		require_once(APPPATH.'libraries/mpdf/mpdf.php');
-		$mpdf = new \mPDF('UTF-8', [300,215]);
+		$mpdf = new \mPDF('UTF-8', [200,215]);
 
 		$institution_id = $this->session->userdata('institute_id');
 		
@@ -220,7 +222,7 @@ class Dashboard extends CI_Controller {
 		$course = $this->db->get_where("tbl_courses",["id"=>$data["branch_data"]->course])->row();
 
 		$html = '
-		<div style="font-family:helvetica; width:70%; margin:auto; padding:10px;">
+		<div style="font-family:helvetica; width:100%; margin:auto; padding:10px;">
 		<div class="container">
 			<h4 style="text-align:center; font-size: 22px;">'.$inst->institute_name.'</h4>
 			 <h4 style="text-align:center; font-size: 22px;">'.$program->program_name."<br>".$course->course_name."<br>".$this->db->get_where("tbl_branches",["id"=>$data["branch_data"]->branch_name])->row()->branch_name.'</h4>
@@ -311,7 +313,7 @@ class Dashboard extends CI_Controller {
 	public function downloadsemesterPdf($bid){
 
 		require_once(APPPATH.'libraries/mpdf/mpdf.php');
-		$mpdf = new \mPDF('UTF-8', [300,215]);
+		$mpdf = new \mPDF('UTF-8', [200,215]);
 
 		$institution_id = $this->session->userdata('institute_id');
 		$inst = $this->db->get_where("tbl_institutes",["id"=>$institution_id])->row();
@@ -329,15 +331,18 @@ class Dashboard extends CI_Controller {
 
 			foreach($s->semesters as $sk => $sem){
 
-				$sem_name = $this->db->get_where("tbl_semesters",["id"=>$sem])->row()->semester_name; 
+				$sem_name = $this->db->get_where("tbl_semesters",["id"=>$sem])->row(); 
 				$subject_category_name = $this->db->get_where("tbl_subject_category",["id"=>$k])->row()->category_name; 
 				$sub_data = $this->db->get_where("tbl_subjects",["id"=>$subjects[$sk]])->row(); 
 				
 				$semesters[] = ["subject_category"=>$subject_category_name,"subject_name"=>$sub_data->subject_name,
-				"ideal_credits"=>$sub_data->ideal_credits,"lecture_hours_per_week"=>$s->lecture_hours_per_week[$sk], "tutorial_hours_per_week"=>$s->tutorial_hours_per_week[$sk], "lab_hours_per_week"=>$s->lab_hours_per_week[$sk], "total_credits"=>$s->total_credits[$sk], "semester_name"=>$sem_name, "subject_id"=>$sub_data->id];
+				"ideal_credits"=>$sub_data->ideal_credits,"lecture_hours_per_week"=>$s->lecture_hours_per_week[$sk], "tutorial_hours_per_week"=>$s->tutorial_hours_per_week[$sk], "lab_hours_per_week"=>$s->lab_hours_per_week[$sk], "total_credits"=>$s->total_credits[$sk], "semester_name"=>$sem_name->semester_name,"semester_number" => $sem_name->semester_number ,"subject_id"=>$sub_data->id];
 			}
 
 		}
+
+		$semsort = array_column($semesters, 'semester_number');
+		array_multisort($semsort, SORT_ASC, $semesters);
 
 		$sids = array();
 		foreach ($semesters as $sm) {
@@ -369,7 +374,7 @@ class Dashboard extends CI_Controller {
 			$max_credits = $icdata->max_credits;
 		}
 
-		$html = '<div style="font-family:helvetica; width:70%; margin:auto; padding:10px;">
+		$html = '<div style="font-family:helvetica; width:100%; margin:auto; padding:10px;">
 		<div class="container">
 			<h4 style="text-align:center; font-size: 22px;">'.$inst->institute_name.'</h4>
 			 <h4 style="text-align:center; font-size: 22px;">'.$program->program_name."<br>".$course->course_name."<br>".$this->db->get_where("tbl_branches",["id"=>$data["branch_data"]->branch_name])->row()->branch_name.'</h4>
@@ -480,7 +485,6 @@ class Dashboard extends CI_Controller {
 			$wdata = [];
 			$wdata["max_weightage"] = round(($min_credits/100)*$w);
 			$wdata["min_weightage"] = round(($max_credits/100)*$w);
-//			$wdata["sub_category"] = $data["sub_categories"][$k];
 			
 			$weigtages[$k] = $wdata;
 			
@@ -936,5 +940,33 @@ class Dashboard extends CI_Controller {
 		
 	}
 
+//  clone app
+
+	public function reference(){
+		$data["programs"] = $this->db->order_by("program_name","asc")->get_where("tbl_programs",["status"=>1,"deleted"=>0])->result();
+		$this->load->view('reference', $data);
+	}
+
+	public function cloneDesign($bid){
+
+		$institution_id = $this->session->userdata('institute_id');
+		$bData = $this->db->get_where("tbl_institute_branches",["id"=>$bid])->row_array();	
+		$dData = $this->db->get_where("tbl_institute_curriculum_design",["branch_id"=>$bid])->row_array();
+		$bData["institute_id"] = $institution_id;
+		unset($bData['id']);
+		unset($dData['id']);
+
+		if($bid){
+			$d = $this->db->insert("tbl_institute_branches",$bData);
+			$dData["branch_id"] = $this->db->insert_id();
+			$d1 = $this->db->insert("tbl_institute_curriculum_design",$dData);
+			$this->session->set_flashdata("emsg", "<div class='alert alert-success'>Design Cloned Successfully</div>");
+			redirect('view-curriculum-designs');
+		}else{
+			$this->session->set_flashdata("emsg", "<div class='alert alert-danger'>Data Not Found</div>");
+			redirect('view-curriculum-designs');
+		}
+
+	}
 	
 }

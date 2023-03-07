@@ -34,9 +34,17 @@
         <div class="col-lg-12 card-col">
         	<div class="row mb-3">
 				<div class="col-lg-6">
-					 <a href="<? echo base_url('view-curriculum-designs') ?>">
-						<i class="fa fa-arrow-left backFields pull-left" data-toggle="tooltip" title="Back To Designs" style="cursor: pointer;font-size: 25px;"></i>
-					 </a>
+
+					<? if($this->input->get("ref") == "reference"){ ?>
+						<a href="<? echo base_url('dashboard/reference') ?>">
+							<i class="fa fa-arrow-left backFields pull-left" data-toggle="tooltip" title="Back To References" style="cursor: pointer;font-size: 25px;"></i>
+					 	</a>
+					<? }else{ ?>	
+					 	<a href="<? echo base_url('view-curriculum-designs') ?>">
+							<i class="fa fa-arrow-left backFields pull-left" data-toggle="tooltip" title="Back To Designs" style="cursor: pointer;font-size: 25px;"></i>
+					 	</a>
+					<? } ?> 
+
 				</div>
 				<div class="col-lg-6 ml-auto d-flex">
 					<p class="mb-0 text-dark p-1 text-left">
@@ -49,6 +57,9 @@
 					  <b style="font-weight: 700">Credits Assigned:</b> <b class="totalCredits"><? echo $totalCredits ?></b>
 					</p>
 					<a target="_blank" href="<? echo base_url('dashboard/downloadsemesterPdf/'.$this->input->get('bid')) ?>"><i class="fa fa-download downloadPdf pull-right mt-1 ml-3" data-toggle="tooltip" title="Download Semester PDF" style="cursor: pointer;font-size: 22px;"></i></a>
+					<? if($this->input->get("ref") == "reference"){ ?>
+						<a target="_blank" href="<? echo base_url('dashboard/cloneDesign/'.$this->input->get('bid')) ?>"><i class="fa fa-copy pull-right mt-1 ml-3" data-toggle="tooltip" title="Clone Design" style="cursor: pointer;font-size: 22px;"></i></a>
+					<? } ?>	
 				</div>
        		</div>
         <? 

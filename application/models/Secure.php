@@ -126,7 +126,7 @@ class Secure extends CI_Model{
 	
 	public function send_email($email,$subject,$msg){
 		
-		$mailin = new Mailin('https://api.sendinblue.com/v2.0','7K1UgA5IMZr3qmYy');
+		/* $mailin = new Mailin('https://api.sendinblue.com/v2.0','4jvK1fEtTURCBmFI');
 		
 			$data = array( "to" => array($email=>$email),
 				"from" => array("info@iae.education","IAE"),
@@ -136,7 +136,43 @@ class Secure extends CI_Model{
 			);
 
 		$s = $mailin->send_email($data);
-//		var_dump($s);
+		var_dump($s); */
+
+		$curl = curl_init();
+
+		curl_setopt_array($curl, array(
+		  CURLOPT_URL => 'https://api.sendinblue.com/v3/smtp/email',
+		  CURLOPT_RETURNTRANSFER => true,
+		  CURLOPT_ENCODING => '',
+		  CURLOPT_MAXREDIRS => 10,
+		  CURLOPT_TIMEOUT => 0,
+		  CURLOPT_FOLLOWLOCATION => true,
+		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		  CURLOPT_CUSTOMREQUEST => 'POST',
+		  CURLOPT_POSTFIELDS =>json_encode([  
+		   "sender"=>[  
+			  "name"=>"IAE",
+			  "email"=>"info@iae.education"
+		   ],
+		   "to"=>[  
+			  [  
+				 "email"=>$email,
+				 "name"=>$email
+			  ]
+		   ],
+		   "subject"=>$subject,
+		   "htmlContent"=>$msg,
+		]),
+		  CURLOPT_HTTPHEADER => array(
+			'accept: application/json',
+			'api-key: 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',
+			'content-type: application/json'
+		  ),
+		));
+
+		$response = curl_exec($curl);
+
+		curl_close($curl);
 		
 	}
 	

@@ -16,6 +16,7 @@ class Semester extends REST_Controller {
 		
 		$id = $this->input->post("id");	
 		$semester_name = $this->input->post("semester_name");
+		$semester_number = $this->input->post("semester_number");
 		
 		if($semester_name == ""){
 			$this->response(["status"=>400,"msg"=>"Semester Name is Required"], REST_Controller::HTTP_OK);
@@ -34,10 +35,10 @@ class Semester extends REST_Controller {
 		
 		if($id){
 			$status = "Updated";
-			$d = $this->db->where("id",$id)->update("tbl_semesters",["semester_name"=>$semester_name]);
+			$d = $this->db->where("id",$id)->update("tbl_semesters",["semester_name"=>$semester_name, "semester_number"=>$semester_number]);
 		}else{
 			$status = "Added";
-			$d = $this->db->insert("tbl_semesters",["semester_name"=>$semester_name]);
+			$d = $this->db->insert("tbl_semesters",["semester_name"=>$semester_name, "semester_number"=>$semester_number]);
 		}
 		
 		if($d){

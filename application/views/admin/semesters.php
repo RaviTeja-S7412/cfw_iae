@@ -40,6 +40,12 @@
 										<input type="text" name="semester_name" required class="form-control" id="exampleInputEmail1" placeholder="Enter Semester Name" value="<? echo $pdata->semester_name ?>">
 									</div>
 								</div>
+								<div class="col-md-4">
+									<div class="form-group">
+										<label for="exampleInputEmail1">Semester In Number</label>
+										<input type="number" name="semester_number" required class="form-control" id="exampleInputEmail1" placeholder="Enter Semester In Number" value="<? echo $pdata->semester_number ?>">
+									</div>
+								</div>
 								<div class="col-md-2">
 									<div class="form-group" style="margin-top: 30px;">
 										<input type="hidden" name="id" value="<? echo $id ?>">
@@ -68,6 +74,7 @@
 						  <tr>
 						  	<th>Sl.No</th>
 							<th>Semester Name</th>
+							<th>Semester Number</th>
 							<th>Action</th>
 						  </tr>
 					  </thead>
@@ -79,6 +86,7 @@
 							  <tr>
 							  	<td><? echo $i ?></td>
 								<td><? echo $d->semester_name ?></td>
+								<td><? echo $d->semester_number ?></td>
 								<td>
 									<a href="<? echo base_url('admin/settings/semesters/index/').$d->id ?>"><i class="fa fa-marker"></i></a>&nbsp;&nbsp;
 									<a href="javascript:void(0)" onClick="deleteRecord(<? echo $d->id ?>)"><i class="fa fa-trash" style="color: red"></i></a>

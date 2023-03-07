@@ -66,6 +66,27 @@ class Ajax extends CI_Controller {
 		echo $html;
 		
 	}
+
+	public function getRefinstitutes(){
+		
+		$institution_id = $this->session->userdata('institute_id');
+		$program = $this->input->post("program");
+		$course = $this->input->post("course");
+		$branch = $this->input->post("branch");
+		
+		$data = $this->db->query("SELECT * FROM tbl_institute_branches as tb INNER JOIN tbl_institute_curriculum_design as tcd ON tb.id=tcd.branch_id WHERE tcd.status = 1 AND tb.institute_id != $institution_id AND tb.branch_name = $branch AND tcd.program = $program AND tcd.course = $course")->result();
+		
+		$html = '<option value="">Select Institute</option>';
+		foreach($data as $d){
+
+			$iData = $this->db->get_where("tbl_institutes",["id"=>$d->institute_id])->row();
+			$html .= '<option value="'.$d->branch_id.'">'.$iData->institute_name.'</option>';
+			
+		}
+		
+		echo $html;
+		
+	}
 	
 	public function getsubCategories(){
 		

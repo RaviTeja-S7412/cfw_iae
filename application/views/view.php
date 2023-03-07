@@ -17,7 +17,7 @@
 	<div class="container">
 		<h4>CURRICULUM DESIGNS</h4>
 		<div class="col-lg-12 card-col">
-			
+			<? echo $this->session->flashdata("emsg"); ?>
 			<table id="example" class="table table-striped table-bordered" style="width:100%">
 				<thead>
 					<tr>
