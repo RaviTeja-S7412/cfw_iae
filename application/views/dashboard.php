@@ -17,9 +17,9 @@
 			  </div>
 			  </a> </div>
 
-			   <div class="col-lg-4"> <a href="#">
+			   <div class="col-lg-4"> <a href="<? echo base_url("dashboard/reference") ?>">
 			  <div class="boxs bg-success"> <i class="fa fa-plus fa-2x" aria-hidden="true"></i>
-				<h4>Reports</h4>
+				<h4>Reference</h4>
 			  </div>
 			  </a> </div>
 

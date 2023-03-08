@@ -61,7 +61,7 @@ class Dashboard extends CI_Controller {
 				$subject_category_name = $this->db->get_where("tbl_subject_category",["id"=>$k])->row()->category_name; 
 				$sub_data = $this->db->get_where("tbl_subjects",["id"=>$subjects[$sk]])->row(); 
 				
-				$semesters[] = ["subject_id"=>$subjects[$sk],"subject_category"=>$subject_category_name,"subject_name"=>$sub_data->subject_name,
+				$semesters[] = ["subject_id"=>$subjects[$sk],"subject_category_id"=>$k,"subject_category"=>$subject_category_name,"subject_name"=>$sub_data->subject_name,
 				"ideal_credits"=>$sub_data->ideal_credits,"lecture_hours_per_week"=>$s->lecture_hours_per_week[$sk], "tutorial_hours_per_week"=>$s->tutorial_hours_per_week[$sk], "lab_hours_per_week"=>$s->lab_hours_per_week[$sk], "total_credits"=>$s->total_credits[$sk], "semester_name"=>$sem_name->semester_name, "semester_number"=>$sem_name->semester_number];
 			}
 
@@ -335,7 +335,7 @@ class Dashboard extends CI_Controller {
 				$subject_category_name = $this->db->get_where("tbl_subject_category",["id"=>$k])->row()->category_name; 
 				$sub_data = $this->db->get_where("tbl_subjects",["id"=>$subjects[$sk]])->row(); 
 				
-				$semesters[] = ["subject_category"=>$subject_category_name,"subject_name"=>$sub_data->subject_name,
+				$semesters[] = ["subject_category"=>$subject_category_name,"subject_category_id"=>$k,"subject_name"=>$sub_data->subject_name,
 				"ideal_credits"=>$sub_data->ideal_credits,"lecture_hours_per_week"=>$s->lecture_hours_per_week[$sk], "tutorial_hours_per_week"=>$s->tutorial_hours_per_week[$sk], "lab_hours_per_week"=>$s->lab_hours_per_week[$sk], "total_credits"=>$s->total_credits[$sk], "semester_name"=>$sem_name->semester_name,"semester_number" => $sem_name->semester_number ,"subject_id"=>$sub_data->id];
 			}
 
@@ -394,9 +394,10 @@ class Dashboard extends CI_Controller {
 				<table style="font-size: 14px; border-collapse: collapse;">
 				  <thead>
 					<tr style="border:1px solid gray;">
-					  <th scope="col" style="border:1px solid gray;">Subject Category</th>
-					  <th scope="col" style="border:1px solid gray;">Subject</th>
-					  <th scope="col" style="border:1px solid gray;">Subject Code</th>
+					  <th scope="col" style="border:1px solid gray;">Course Category</th>
+					  <th scope="col" style="border:1px solid gray;">Category Code</th>
+					  <th scope="col" style="border:1px solid gray;">Course Title</th>
+					  <th scope="col" style="border:1px solid gray;">Course Code</th>
 					  <th scope="col" style="border:1px solid gray;">Lecture Hours Per Week</th>
 					  <th scope="col" style="border:1px solid gray;">Tutorial Hours Per Week</th>
 					  <th scope="col" style="border:1px solid gray;">Practicals/ Lab Hours Per Week</th>
@@ -419,9 +420,11 @@ class Dashboard extends CI_Controller {
 						array_push($total_credits, $sub['total_credits']);
 
 						$cdata = $this->db->get_where("tbl_course_codes",["course_id"=>$sub['subject_id'],"institute_id"=>$this->session->userdata("institute_id")])->row();
+						$ccdata = $this->db->get_where("tbl_course_category_codes",["course_category_id"=>$sub['subject_category_id'],"institute_id"=>$this->session->userdata("institute_id")])->row();
 				  
 						$html .= '<tr  style="border:1px solid gray;">
 						  <td scope="row" style="text-align: left; border:1px solid gray;">'.$sub['subject_category'].'</td>
+						  <td scope="row" style="text-align: left; border:1px solid gray;">'.$ccdata->course_category_code.'</td>
 						  <td scope="row" style="text-align: left; border:1px solid gray;">'.$sub['subject_name'].'</td>
 						  <td scope="row" style="text-align: left; border:1px solid gray;">'.$cdata->course_code.'</td>
 						  <td style="border:1px solid gray;text-align: center;">'.$sub['lecture_hours_per_week'].'</td>
@@ -433,6 +436,7 @@ class Dashboard extends CI_Controller {
 				}
 
 				$html .= '<tr>
+							<td style="border:1px solid gray;text-align: center;"></td>
 							<td style="border:1px solid gray;text-align: center;"></td>
 							<td style="border:1px solid gray;text-align: center;"></td>
 							<td style="border:1px solid gray;text-align: center;">Total</td>

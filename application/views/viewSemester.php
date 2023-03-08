@@ -74,8 +74,9 @@
 			  <table id="example" class="table table-striped table-bordered" style="font-size: 14px">
 				<thead>
 				  <tr>
-					<th scope="col">Subject Category</th>
-					<th scope="col">Course</th>
+					<th scope="col">Course Category</th>
+					<th scope="col">Category Code</th>
+					<th scope="col">Course Title</th>
 					<th scope="col">Course Code</th>
 					<th scope="col">Ideal Credits</th>
 					<th scope="col">Lecture Hours Per Week</th>
@@ -98,6 +99,7 @@
 						if($sub['semester_name'] == $sc){
 
 							$cdata = $this->db->get_where("tbl_course_codes",["course_id"=>$sub['subject_id'],"institute_id"=>$this->session->userdata("institute_id")])->row();
+							$ccdata = $this->db->get_where("tbl_course_category_codes",["course_category_id"=>$sub['subject_category_id'],"institute_id"=>$this->session->userdata("institute_id")])->row();
 
 							array_push($ideal_credits, $sub['ideal_credits']);
 							array_push($lecture_hours_per_week, $sub['lecture_hours_per_week']);
@@ -109,6 +111,7 @@
 				?>
 					  <tr>
 						<td scope="row" style="text-align: left"><? echo $sub['subject_category']; ?></td>
+						<td scope="row" style="text-align: left"><? echo $ccdata->course_category_code; ?></td>
 						<td scope="row" style="text-align: left"><? echo $sub['subject_name']; ?></td>
 						<td scope="row" style="text-align: left"><? echo $cdata->course_code; ?></td>
 						<td><? echo $sub['ideal_credits'] ?></td>
@@ -119,6 +122,7 @@
 					  </tr>
 				<? }} ?>
 					 <tr>
+					 	<td></td>
 					 	<td></td>
 					 	<td></td>
 						<td>Total</td>

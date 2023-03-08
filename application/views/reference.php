@@ -44,7 +44,7 @@
 					<form method="get" action="<? echo base_url('dashboard/viewsemester') ?>">
 						<br>
 						<div class="form-group">
-							<select class="custom-select" name="bid" id="institutes" required>
+							<select class="custom-select js-example-basic-single" name="bid" id="institutes" style="width:100% !important;" required>
 								<option value="">Select Institute</option>
 							</select>	
 						</div>
@@ -63,7 +63,14 @@
 
 <? $this->load->view( "front_common/footer" ) ?>
 
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <script type="text/javascript">
+
+	$(document).ready(function() {
+		$('.js-example-basic-single').select2();
+	});
 
 	function getCourses(){
 		
