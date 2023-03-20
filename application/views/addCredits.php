@@ -79,6 +79,7 @@
 					<th scope="col">Tutorial Hours Per Week</th>
 					<th scope="col">Practicals/ Lab Hours Per Week</th>
 					<th scope="col">Credits</th>
+					<th scope="col">Hours/Credits</th>
 					<th scope="col">Select Semister</th>
 				  </tr>
 				</thead>
@@ -122,6 +123,23 @@
 						<td><input type="number" class="form-control getCreditvalue getCredittutorial-<? echo $randomkey ?> ugetCredittutorial-<? echo $sc ?>" ref="<? echo $randomkey ?>" name="tutorial_hours_per_week-<? echo $sc ?>[]" subcat="<? echo $sc ?>" min="0" step="0.01" value="<? echo $creditsData->tutorial_hours_per_week[$sk] ?>" <? echo ($ref == "view") ? 'readonly' : '' ?> required></td>
 						<td><input type="number" class="form-control getCreditvalue getCreditlab-<? echo $randomkey ?> ugetCreditlab-<? echo $sc ?>" ref="<? echo $randomkey ?>" name="lab_hours_per_week-<? echo $sc ?>[]" subcat="<? echo $sc ?>" min="0" step="0.01" value="<? echo $creditsData->lab_hours_per_week[$sk] ?>" <? echo ($ref == "view") ? 'readonly' : '' ?> required></td>
 						<td><input type="number" class="form-control getCredittotal-<? echo $randomkey ?> ugetCredittotal-<? echo $sc ?>" name="total_credits-<? echo $sc ?>[]" ref="<? echo $randomkey ?>" subcat="<? echo $sc ?>" value="<? echo $creditsData->total_credits[$sk] ?>" readonly></td>
+						<td>
+						<div class="form-check-inline pull-left">
+							<label class="form-check-label">
+								<input type="radio" name="hours_credits-<? echo $sub ?>[]" class="form-check-input changeHourscredits gethoursCredits-<? echo $randomkey ?>" ref="<? echo $randomkey ?>" value="hours_credits" checked>Hours & Credits
+							</label>
+						</div>
+						<div class="form-check-inline pull-left">
+							<label class="form-check-label">
+								<input type="radio" name="hours_credits-<? echo $sub ?>[]" class="form-check-input changeHourscredits gethoursCredits-<? echo $randomkey ?>" ref="<? echo $randomkey ?>" value="hours">Hours
+							</label>
+						</div>
+						<div class="form-check-inline pull-left">
+							<label class="form-check-label">
+								<input type="radio" name="hours_credits-<? echo $sub ?>[]" class="form-check-input changeHourscredits gethoursCredits-<? echo $randomkey ?>" ref="<? echo $randomkey ?>" value="credits">Credits
+							</label>
+						</div>
+						</td>
 						<td>
 							<select class="custom-select ugetSemester-<? echo $sc ?>" name="semester-<? echo $sc ?>[]" <? echo ($ref == "view") ? 'disabled' : '' ?> required>
 							  <option value="">Semester</option>
@@ -204,6 +222,32 @@
 <? $this->load->view( "front_common/footer" ) ?>
 
 <script type="text/javascript">
+
+	$(".changeHourscredits").change(function(){
+		var ref = $(this).attr("ref");
+		var val = $(this).val();
+
+		if(val == "hours_credits"){
+			$(".getCredittotal-"+ref).attr("readonly", "readonly");
+			$(".getCreditlecture-"+ref).removeAttr("readonly", "readonly");
+			$(".getCredittutorial-"+ref).removeAttr("readonly", "readonly");
+			$(".getCreditlab-"+ref).removeAttr("readonly", "readonly");
+		}else if(val == "hours"){
+			$(".getCredittotal-"+ref).attr("readonly", "readonly");
+			$(".getCreditlecture-"+ref).removeAttr("readonly", "readonly");
+			$(".getCredittutorial-"+ref).removeAttr("readonly", "readonly");
+			$(".getCreditlab-"+ref).removeAttr("readonly", "readonly");
+		}else if(val == "credits"){
+			$(".getCredittotal-"+ref).removeAttr("readonly", "readonly");
+			$(".getCreditlecture-"+ref).attr("readonly", "readonly");
+			$(".getCredittutorial-"+ref).attr("readonly", "readonly");
+			$(".getCreditlab-"+ref).attr("readonly", "readonly");
+		}
+		$(".getCredittotal-"+ref).val("");
+		$(".getCreditlecture-"+ref).val("");
+		$(".getCredittutorial-"+ref).val("");
+		$(".getCreditlab-"+ref).val("");
+	})
 	
 	$("#updateHRCredits").submit(function(e){
 		
@@ -236,7 +280,8 @@
 	$(".updateCredits").click(function(){
 		
 		var uref = $(this).attr("uref");
-		
+		var hoursLecture = $(".gethoursCredits-"+uref+':checked').val();
+
 		var lecture_hours_per_week = []; 
 		$(".ugetCreditlecture-"+uref).each(function(index,data) {
 			if($(this).val()){
@@ -315,14 +360,14 @@
 			return false;
 		} */
 
-		if(total_credits.length == 0){
+		/* if(total_credits.length == 0){
 			swal(
 			  '',
 			  'Total Credits Are Empty.',
 			  'error'
 			);
 			return false;
-		}
+		} */
 		
 		var semester = []; 
 		$(".ugetSemester-"+uref).each(function(index,data) {
@@ -421,6 +466,7 @@
 		var lectureCredits = $(".getCreditlecture-"+ref).val();
 		var tutorialCredits = $(".getCredittutorial-"+ref).val();
 		var labCredits = $(".getCreditlab-"+ref).val();
+		var hoursLecture = $(".gethoursCredits-"+ref+':checked').val();
 		
 		<? if($iData->lecture_credits == 0){ ?>
 			var lc = (lectureCredits != "") ? parseFloat(lectureCredits) : 0;
@@ -441,8 +487,8 @@
 		<? } ?>		
 		
 		var total = lc+tc+lac;
-
-		$(".getCredittotal-"+ref).val(total);
+		if(hoursLecture == "hours_credits")	
+			$(".getCredittotal-"+ref).val(total);
 		
 		var subcatValues = $("input[name='total_credits-"+subid+"[]']")
               .map(function(){
@@ -524,8 +570,8 @@
 			<? } ?>
 
 			var total1 = lc1+tc1+lac1;
-			
-			$(".getCredittotal-"+ref).val(total1);
+			if(hoursLecture == "hours_credits")
+				$(".getCredittotal-"+ref).val(total1);
 			return false;
 		}
 

@@ -571,10 +571,10 @@ class Dashboard extends CI_Controller {
 			}
 			foreach($total as $to){
 				
-				if(($to == "") || ($subjectsCount != count($total))){
+				/* if(($to == "") || ($subjectsCount != count($total))){
 					echo json_encode(["status"=>false,"msg"=>"Total Hours Should Not Be Empty."]);
 					exit(); 
-				}
+				} */
 				
 			}
 			foreach($semesters as $sm){
@@ -803,6 +803,19 @@ class Dashboard extends CI_Controller {
 					foreach($course_category_codes as $ccc){
 						$this->db->where(["course_category_id"=> $ccc["course_category_id"], "institute_id"=> $ccc["institute_id"]])->update("tbl_course_category_codes",["course_category_code"=>$ccc["course_category_code"]]);
 					}
+
+					foreach($course_category_codes as $ccc){
+
+						$cccChk = $this->db->get_where("tbl_course_category_codes", ["course_category_id"=>$ccc['course_category_id'],"institute_id"=> $inst_id]);
+
+						if($cccChk->num_rows() > 0){
+							$this->db->where("id",$cccChk->row()->id)->update("tbl_course_category_codes", ["course_category_code" => $ccc["course_category_code"]]);
+						}else{
+							$this->db->insert("tbl_course_category_codes", $ccc);
+						}
+
+					}
+
 				}else{
 					$pd = $this->db->insert("tbl_institute_curriculum_design",$pdata);
 					$lid = $this->db->insert_id();

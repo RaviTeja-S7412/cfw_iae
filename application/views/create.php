@@ -208,7 +208,7 @@
 <script type="text/javascript">
 
 	$(document).ready(function(){
-		$("#popupModal").modal("show")
+		// $("#popupModal").modal("show")
 	})
 
 	$("#updateCredits").submit(function(e){
