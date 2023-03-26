@@ -21,8 +21,8 @@
 			<table id="example" class="table table-striped table-bordered" style="width:100%">
 				<thead>
 					<tr>
+						<th>Program Level</th>
 						<th>Program Name</th>
-						<th>Course name</th>
 						<th>Branch</th>
 						<th>Action</th>
 					</tr>

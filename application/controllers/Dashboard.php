@@ -515,7 +515,7 @@ class Dashboard extends CI_Controller {
 	}
 	
 	public function insertCredits(){
-		
+
 		$bid = $this->input->post("bid");
 		$sub_id = $this->input->post("sub_id");
 		$bd = $this->db->get_where("tbl_institute_branches",["id"=>$bid])->row();
@@ -542,6 +542,7 @@ class Dashboard extends CI_Controller {
 			$tutorial = $this->input->post("tutorial_hours_per_week");
 			$lab = $this->input->post("lab_hours_per_week");
 			$total = $this->input->post("total_credits");
+			$hours_credits = $this->input->post("hours_credits");
 			$semesters = $this->input->post("semester");
 			$subjectsCount = $this->input->post("subjectsCount");
 			
@@ -592,7 +593,7 @@ class Dashboard extends CI_Controller {
 					$credits[$ssc] = $exCredits[$ssc];
 				}else{
 					if($ssc == $sub_id){
-						$credits[$ssc] = ["lecture_hours_per_week"=>$lectures,"tutorial_hours_per_week"=>$tutorial,"lab_hours_per_week"=>$lab,"total_credits"=>$total,"semesters"=>$semesters];
+						$credits[$ssc] = ["lecture_hours_per_week"=>$lectures,"tutorial_hours_per_week"=>$tutorial,"lab_hours_per_week"=>$lab,"total_credits"=>$total,"hours_credits"=>$hours_credits,"semesters"=>$semesters];
 					}
 				}
 			}
@@ -615,9 +616,14 @@ class Dashboard extends CI_Controller {
 				$total = $this->input->post("total_credits-$sc");
 				$semesters = $this->input->post("semester-$sc");
 
+				$hours_credits = [];
+
+				foreach($subject_id as $subject){
+					$hours_credits[] = $this->input->post("hours_credits-$subject")[0];
+				}
 				$totalCredits += array_sum($total);
 
-				$credits[$sc] = ["lecture_hours_per_week"=>$lectures,"tutorial_hours_per_week"=>$tutorial,"lab_hours_per_week"=>$lab,"total_credits"=>$total,"semesters"=>$semesters];
+				$credits[$sc] = ["lecture_hours_per_week"=>$lectures,"tutorial_hours_per_week"=>$tutorial,"lab_hours_per_week"=>$lab,"total_credits"=>$total,"hours_credits"=>$hours_credits,"semesters"=>$semesters];
 
 				foreach($subject_id as $ski => $si){
 					$course_codes[] = ["course_id"=>$si, "institute_id"=>$this->session->userdata("institute_id"), "course_code"=>$course_code[$ski]];

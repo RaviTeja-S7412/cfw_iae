@@ -21,7 +21,7 @@ class Ajax extends CI_Controller {
 		$this->db->join("tbl_branches","tbl_course_branch_links.branch=tbl_branches.id");
 		$data = $this->db->order_by("tbl_branches.branch_name","asc")->get_where("tbl_course_branch_links",["tbl_course_branch_links.course"=>$id])->result();
 		
-		$html = '<option value="">Select Branch</option>';
+		$html = '<option value="">Choose Branch</option>';
 		foreach($data as $d){
 			$sel = ($cid == $d->id) ? 'selected' : '';	
 			$html .= '<option value="'.$d->id.'" '.$sel.'>'.$d->branch_name.'</option>';
@@ -43,7 +43,7 @@ class Ajax extends CI_Controller {
 		$this->db->join("tbl_courses","tbl_program_course_links.course=tbl_courses.id");
 		$data = $this->db->order_by("tbl_courses.course_name","asc")->get_where("tbl_program_course_links",["tbl_program_course_links.program"=>$id])->result();
 		
-		$html = '<option value="">Select Course</option>';
+		$html = '<option value="">Choose Program</option>';
 		foreach($data as $d){
 
 			$icChk = $this->db->get_where("tbl_institution_course_credits",["course_id"=>$d->id, "institution_id"=>$institution_id]);

@@ -45,7 +45,7 @@
 						
 				?>
 					<hr style="border: 1px solid #000" />	
-					<h5 style="text-align: center; margin-top: 20px"><? echo $scdata->category_name ?></h5>
+					<h5 style="text-align: center; margin-top: 20px"><? echo ($key+1).". ".$scdata->category_name ?></h5>
 					<hr style="border: 1px solid #000" />
 						<select multiple="multiple" name="subjects-<? echo $sc ?>[]" id="subjects-<? echo $sc ?>" title="duallistbox_demo1[]">
 						<?
@@ -68,7 +68,7 @@
 					<div class="row" style="margin-top:10px; margin-bottom:10px">
 						<div class="col-md-12">
 							<!-- <input type="button" class="btn btn-info pull-left new_subjects" course_category="<? //echo $sc ?>" value="Add New Subjects"> -->
-							<small style="color: red;">Didn’t find the Subject what you are looking for? <a href="javascript:void(0)" class="new_subjects" course_category="<? echo $sc ?>">Click here</a> to add New Subject</small>
+							<small style="color: red;">Didn’t find the Course Name what you are looking for? <a href="javascript:void(0)" class="new_subjects" course_category="<? echo $sc ?>">Click here</a> to add New Course Name</small>
 						</div>
 					</div>
 					<div class="row">

@@ -1,7 +1,12 @@
 <? $this->load->view("front_common/header") ?>
 
+<? 
+	$iData = $this->db->get_where("tbl_institutes",["id"=>$this->session->userdata("institute_id")])->row();
+?>
+
 	<div class="content1">
 	  <div class="container">
+		<h4 align="center"><? echo $iData->institute_name ?></h4>
 	  	<h4>Curriculum Design</h4>
 		<div class="col-lg-12 card-col">
 		  

@@ -24,7 +24,7 @@
 				<div class="row mt-4" id="create_fields">
 					<div class="col-lg-6 rspnsv-mb">
 						<select class="custom-select" name="program" id="program" required>
-							<option value="">Program</option>
+							<option value="">Choose Program Level</option>
 							<? foreach($programs as $p){
 								$sel = ($branch_data->program == $p->id) ? 'selected' : '';
 								echo '<option value="'.$p->id.'" '.$sel.'>'.$p->program_name.'</option>';
@@ -33,7 +33,7 @@
 					</div>
 					<div class="col-lg-6">
 						<select class="custom-select" name="course" id="courses" required>
-							<option value="">Course</option>
+							<option value="">Choose Program</option>
 						</select>
 					</div>
 					<div class="col-lg-9 cnote" style="margin-top: 20px; display: none">
@@ -45,7 +45,7 @@
 						<br>
 						<div class="form-group">
 							<select class="custom-select" name="branch_name" id="branches" required>
-								<option value="">Branch</option>
+								<option value="">Choose Branch</option>
 							</select>
 							<small style="color: red;">Didn’t find the Branch what you are looking for? <a href="javascript:void(0)" data-toggle="modal" data-target="#branchModal">Click here</a> to add New Branch</small>	
 						</div>
@@ -62,7 +62,7 @@
 						</div>
 					</div>
 					<div class="col-md-12">
-						<small style="color: red; display:none;" class="new_course_category">Didn’t find the Course Catergory what you are looking for? <a href="javascript:void(0)" data-toggle="modal" data-target="#myModal">Click here</a> to add Course Catergory</small>
+						<small style="color: red; display:none;" class="new_course_category">Didn’t find the Course Category what you are looking for? <a href="javascript:void(0)" data-toggle="modal" data-target="#myModal">Click here</a> to add Course Category</small>
 						<input type="button" class="btn btn-primary pull-right" id="gotoWeightage" value="Save & Next">
 					</div>
 					
