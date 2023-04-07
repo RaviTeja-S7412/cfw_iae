@@ -74,10 +74,9 @@
 					<div class="row">
 						<div class="form-group col-md-6">
 							<label>Electives</label>
-							<select class="form-control electives electives-<? echo $sc ?>" ref="<? echo $sc ?>" name="electives-<? echo $sc ?>[]">
+							<select class="form-control electives electives-<? echo $sc ?>" ref="<? echo $sc ?> " name="electives-<? echo $sc ?>[]">
 								<option value="">Select Elective</option>
 								<?
-									$this->db->select("id,subject_name");
 									$esubjects = $this->db->get_where("tbl_subjects",["elective_status"=>"common"])->result();
 									foreach($esubjects as $esub){		
 
@@ -86,7 +85,7 @@
 											$ssel = "selected";
 										}
 
-										echo '<option value="'.$esub->id.'" '.$ssel.'>'.$esub->subject_name.'</option>';
+										echo '<option value="'.$esub->id.'" '.$ssel.' eStatus="'.$esub->elective_status.'"  eType="'.$esub->elective_type.'">'.$esub->subject_name.'</option>';
 
 									}
 								?>
@@ -97,7 +96,6 @@
 							<select class="form-control open_electives open_electives-<? echo $sc ?>" ref="<? echo $sc ?>" name="open_electives-<? echo $sc ?>[]">
 								<option value="">Select Open Elective</option>
 								<?
-									$this->db->select("id,subject_name");
 									$oesubjects = $this->db->get_where("tbl_subjects",["elective_status"=>"open"])->result();
 
 									foreach($oesubjects as $osub){		
@@ -107,7 +105,7 @@
 											$ssel = "selected";
 										}
 
-										echo '<option value="'.$osub->id.'" '.$ssel.'>'.$osub->subject_name.'</option>';
+										echo '<option value="'.$osub->id.'" '.$ssel.' eStatus="'.$osub->elective_status.'"  eType="'.$osub->elective_type.'">'.$osub->subject_name.'</option>';
 
 									}
 								?>
@@ -156,6 +154,24 @@
   </div>
 </div>
 
+<div id="instModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header" style="display:block">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title" style="font-size:18px">Instructions</h4>
+      </div>
+      <div class="modal-body p-0 pt-2">
+		<div class="container instructions p-0">
+
+		</div>
+      </div>
+    </div>
+
+  </div>
+</div>
 
 <script type="text/javascript">
 
@@ -170,6 +186,20 @@
 	$(".electives").change(function(){
 		
 		var sub_id = $(this).attr("ref");
+		var eStatus = $('option:selected', this).attr('eStatus');
+		var eType = $('option:selected', this).attr('eType');
+		
+		if(eType == "mini_project"){
+			$(".instructions").html('<ul><li>Mini Project should be added between 3rd semester and 6th semester</li></ul>')
+			$("#instModal").modal("show");
+		}else if(eType == "economics_for_engineer" || eType == "hvpe" || eType == "environmental_studies"){
+			$(".instructions").html('<ul><li>Please check work load balance for the available faculty.</li></ul>')
+			$("#instModal").modal("show");
+		}else if(eStatus == "open"){
+			$(".instructions").html('<ul><li>Open electives can be added in 3rd Semester to 6th Semester</li><li></li>Colleges can plan for Track Base / General Pool Open Electives.</ul>')
+			$("#instModal").modal("show");
+		}
+
 		var elecs = [];
 		
 		<? foreach($sub_categories as $key => $ssc){ ?>
@@ -200,9 +230,9 @@
 
 							var sdata = data.subjects[key][key1];
 							if(sdata.selected == "true"){
-								subjects += '<option value="'+sdata.id+'" selected>'+sdata.subject_name+'</option>';		
+								subjects += '<option value="'+sdata.id+'" eStatus="'+sdata.eStatus+'" eType="'+sdata.eType+'" selected>'+sdata.subject_name+'</option>';		
 							}else{
-								subjects += '<option value="'+sdata.id+'">'+sdata.subject_name+'</option>';
+								subjects += '<option value="'+sdata.id+'" eStatus="'+sdata.eStatus+'" eType="'+sdata.eType+'">'+sdata.subject_name+'</option>';
 							}
 
 					   	}
@@ -222,6 +252,20 @@
 	$(".open_electives").change(function(){
 		
 		var sub_id = $(this).attr("ref");
+		var eStatus = $('option:selected', this).attr('eStatus');
+		var eType = $('option:selected', this).attr('eType');
+
+		if(eType == "mini_project"){
+			$(".instructions").html('<ul><li>Mini Project should be added between 3rd semester and 6th semester</li></ul>')
+			$("#instModal").modal("show");
+		}else if(eType == "economics_for_engineer" || eType == "hvpe" || eType == "environmental_studies"){
+			$(".instructions").html('<ul><li>Please check work load balance for the available faculty.</li></ul>')
+			$("#instModal").modal("show");
+		}else if(eStatus == "open"){
+			$(".instructions").html('<ul><li>Open electives can be added in 3rd Semester to 6th Semester</li><li>Colleges can plan for Track Base / General Pool Open Electives.</li></ul>')
+			$("#instModal").modal("show");
+		}
+
 		var elecs = [];
 		
 		<? foreach($sub_categories as $key => $ssc1){ ?>
@@ -252,9 +296,9 @@
 
 							var sdata = data.subjects[key][key1];
 							if(sdata.selected == "true"){
-								subjects += '<option value="'+sdata.id+'" selected>'+sdata.subject_name+'</option>';		
+								subjects += '<option value="'+sdata.id+'" eStatus="'+sdata.eStatus+'" eType="'+sdata.eType+'" selected>'+sdata.subject_name+'</option>';		
 							}else{
-								subjects += '<option value="'+sdata.id+'">'+sdata.subject_name+'</option>';
+								subjects += '<option value="'+sdata.id+'" eStatus="'+sdata.eStatus+'" eType="'+sdata.eType+'">'+sdata.subject_name+'</option>';
 							}
 
 					   	}

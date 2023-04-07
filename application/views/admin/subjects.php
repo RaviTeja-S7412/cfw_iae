@@ -56,8 +56,21 @@
 										</select>
 									</div>
 								</div>
-								<div class="col-md-2">
+								<div class="col-md-4">
 									<div class="form-group">
+										<label for="exampleInputEmail1">Elective Type</label>
+										<select class="form-control" name="elective_type" required>
+											<option value="all" <? echo ($pdata->elective_type == 'all') ? 'selected' : '' ?>>NA</option>
+											<option value="professional_electives" <? echo ($pdata->elective_type == 'professional_electives') ? 'selected' : '' ?>>Professional Electives</option>
+											<option value="mini_project" <? echo ($pdata->elective_type == 'mini_project') ? 'selected' : '' ?>>Mini Project</option>
+											<option value="economics_for_engineer" <? echo ($pdata->elective_type == 'economics_for_engineer') ? 'selected' : '' ?>>Economics for Engineer</option>
+											<option value="environmental_studies" <? echo ($pdata->elective_type == 'environmental_studies') ? 'selected' : '' ?>>Environmental studies</option>
+											<option value="hvpe" <? echo ($pdata->elective_type == 'hvpe') ? 'selected' : '' ?>>HVPE</option>
+										</select>
+									</div>
+								</div>
+								<div class="col-md-2">
+									<div class="form-group" style="margin-top: 30px;">
 										<input type="hidden" name="id" value="<? echo $id ?>">
 										<button type="submit" class="btn btn-block bg-gradient-primary"><? echo ($id != "") ? 'Update' : 'Submit'; ?></button>
 									</div>
@@ -86,6 +99,7 @@
 							<th>Subject Name</th>
 							<th>Ideal Credits</th>
 							<th>Elective Status</th>
+							<th>Elective Type</th>
 							<th>Action</th>
 						  </tr>
 					  </thead>
@@ -105,6 +119,14 @@
 											echo 'Electives';
 										} elseif($d->elective_status == 'open'){
 											echo 'Open Electives';
+										} 
+									?>
+								</td>
+								<td><? 
+							  			if($d->elective_type == 'all'){
+											echo 'NA';
+										}else{
+											echo $d->elective_type;
 										} 
 									?>
 								</td>

@@ -92,7 +92,7 @@
 				  
 				<? 
 					$subjects = json_decode($branch_data->subjects)->$sc;
-
+					
 					$ideal_credits = [];
 					$lecture_hours_per_week = [];
 					$tutorial_hours_per_week = [];
@@ -104,14 +104,14 @@
 						$randomkey = random_string("alnum",10);
 						$sdata = $this->db->get_where("tbl_subjects",["id"=>$sub])->row();
 
-						$creditsData = json_decode($branch_data->credits)->$sc;
-						$hCredits = $creditsData->hours_credits[$sk];
+						$creditsData = json_decode($branch_data->credits,true)[$sc];
+						$hCredits = $creditsData['hours_credits'][$sub];
 
 						array_push($ideal_credits, $sdata->ideal_credits);
-						array_push($lecture_hours_per_week, $creditsData->lecture_hours_per_week[$sk]);
-						array_push($tutorial_hours_per_week, $creditsData->tutorial_hours_per_week[$sk]);
-						array_push($lab_hours_per_week, $creditsData->lab_hours_per_week[$sk]);
-						array_push($total_credits, $creditsData->total_credits[$sk]);
+						array_push($lecture_hours_per_week, $creditsData['lecture_hours_per_week'][$sub]);
+						array_push($tutorial_hours_per_week, $creditsData['tutorial_hours_per_week'][$sub]);
+						array_push($lab_hours_per_week, $creditsData['lab_hours_per_week'][$sub]);
+						array_push($total_credits, $creditsData['total_credits'][$sub]);
 				?>
 					  <tr>
 						<th scope="row" style="text-align: left"><? echo $sdata->subject_name; ?></th>
@@ -120,10 +120,10 @@
 							<input type="hidden" class="form-control usubject_id-<? echo $sc ?>" name="subject_id-<? echo $sc ?>[]" value="<? echo $sdata->id ?>" required>
 						</td>
 						<td><input type="number" class="form-control" value="<? echo $sdata->ideal_credits ?>" readonly></td>
-						<td><input type="number" class="form-control getCreditvalue getCreditlecture-<? echo $randomkey ?> ugetCreditlecture-<? echo $sc ?>" ref="<? echo $randomkey ?>" name="lecture_hours_per_week-<? echo $sc ?>[]" subcat="<? echo $sc ?>" min="0" step="0.01" value="<? echo $creditsData->lecture_hours_per_week[$sk] ?>" <? echo ($ref == "view" || $hCredits == "credits") ? 'readonly' : '' ?> required></td>
-						<td><input type="number" class="form-control getCreditvalue getCredittutorial-<? echo $randomkey ?> ugetCredittutorial-<? echo $sc ?>" ref="<? echo $randomkey ?>" name="tutorial_hours_per_week-<? echo $sc ?>[]" subcat="<? echo $sc ?>" min="0" step="0.01" value="<? echo $creditsData->tutorial_hours_per_week[$sk] ?>" <? echo ($ref == "view" || $hCredits == "credits") ? 'readonly' : '' ?> required></td>
-						<td><input type="number" class="form-control getCreditvalue getCreditlab-<? echo $randomkey ?> ugetCreditlab-<? echo $sc ?>" ref="<? echo $randomkey ?>" name="lab_hours_per_week-<? echo $sc ?>[]" subcat="<? echo $sc ?>" min="0" step="0.01" value="<? echo $creditsData->lab_hours_per_week[$sk] ?>" <? echo ($ref == "view" || $hCredits == "credits") ? 'readonly' : '' ?> required></td>
-						<td><input type="number" class="form-control ggetCredittotal getCredittotal-<? echo $randomkey ?> ugetCredittotal-<? echo $sc ?>" name="total_credits-<? echo $sc ?>[]" ref="<? echo $randomkey ?>" subcat="<? echo $sc ?>" value="<? echo $creditsData->total_credits[$sk] ?>" <? echo ($ref == "view" || $hCredits !== "credits") ? 'readonly' : '' ?>></td>
+						<td><input type="number" class="form-control getCreditvalue getCreditlecture-<? echo $randomkey ?> ugetCreditlecture-<? echo $sc ?>" ref="<? echo $randomkey ?>" name="lecture_hours_per_week-<? echo $sc ?>[]" subcat="<? echo $sc ?>" min="0" step="0.01" value="<? echo $creditsData['lecture_hours_per_week'][$sub] ?>" <? echo ($ref == "view" || $hCredits == "credits") ? 'readonly' : '' ?> required></td>
+						<td><input type="number" class="form-control getCreditvalue getCredittutorial-<? echo $randomkey ?> ugetCredittutorial-<? echo $sc ?>" ref="<? echo $randomkey ?>" name="tutorial_hours_per_week-<? echo $sc ?>[]" subcat="<? echo $sc ?>" min="0" step="0.01" value="<? echo $creditsData['tutorial_hours_per_week'][$sub] ?>" <? echo ($ref == "view" || $hCredits == "credits") ? 'readonly' : '' ?> required></td>
+						<td><input type="number" class="form-control getCreditvalue getCreditlab-<? echo $randomkey ?> ugetCreditlab-<? echo $sc ?>" ref="<? echo $randomkey ?>" name="lab_hours_per_week-<? echo $sc ?>[]" subcat="<? echo $sc ?>" min="0" step="0.01" value="<? echo $creditsData['lab_hours_per_week'][$sub] ?>" <? echo ($ref == "view" || $hCredits == "credits") ? 'readonly' : '' ?> required></td>
+						<td><input type="number" class="form-control ggetCredittotal getCredittotal-<? echo $randomkey ?> ugetCredittotal-<? echo $sc ?>" name="total_credits-<? echo $sc ?>[]" ref="<? echo $randomkey ?>" subcat="<? echo $sc ?>" value="<? echo $creditsData['total_credits'][$sub] ?>" <? echo ($ref == "view" || $hCredits !== "credits") ? 'readonly' : '' ?>></td>
 						<td>
 
 						<div class="form-check-inline pull-left">
@@ -150,7 +150,7 @@
 							<select class="custom-select ugetSemester-<? echo $sc ?>" name="semester-<? echo $sc ?>[]" <? echo ($ref == "view") ? 'disabled' : '' ?> required>
 							  <option value="">Semester</option>
 							  <? foreach($semesters as $sem){
-									$sel = ($sem->id == $creditsData->semesters[$sk]) ? 'selected' : '';
+									$sel = ($sem->id == $creditsData['semesters'][$sub]) ? 'selected' : '';
 									echo '<option value="'.$sem->id.'" '.$sel.'>'.$sem->semester_name.'</option>';
 								} ?>
 							</select>
@@ -601,7 +601,7 @@
 		var min_weightage = $("#min_weightage-"+subid).val();
 		var category = $("#category_name-"+subid).val();
 
-		if(parseFloat(total) > 20){
+		if(parseFloat(total) > 20 && hoursLecture !== "hours"){
 			swal(
 			  '',
 			  'Total value of Credits are not more than 20 for each semister for '+category,

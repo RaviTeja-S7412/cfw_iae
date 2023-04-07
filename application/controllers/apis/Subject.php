@@ -18,28 +18,29 @@ class Subject extends REST_Controller {
 		$subject_name = $this->input->post("subject_name");
 		$ideal_credits = $this->input->post("ideal_credits");
 		$elective_status = $this->input->post("elective_status");
+		$elective_type = $this->input->post("elective_type");
 		
 		if($subject_name == ""){
 			$this->response(["status"=>400,"msg"=>"Subject Name is Required"], REST_Controller::HTTP_OK);
 			exit();
 		}
 		
-		if($id){
+		/* if($id){
 			$this->db->where(["id !="=>$id]);
 		}
 		$pChk = $this->db->get_where("tbl_subjects",["subject_name"=>$subject_name])->num_rows();
 		if($pChk > 0){
 			$this->response(["status"=>400,"msg"=>"Subject Name Already Exists"], REST_Controller::HTTP_OK);
 			exit();
-		}
+		} */
 		
 		
 		if($id){
 			$status = "Updated";
-			$d = $this->db->where("id",$id)->update("tbl_subjects",["subject_name"=>$subject_name,"ideal_credits"=>$ideal_credits,"elective_status"=>$elective_status]);
+			$d = $this->db->where("id",$id)->update("tbl_subjects",["subject_name"=>$subject_name,"ideal_credits"=>$ideal_credits,"elective_status"=>$elective_status,"elective_type"=>$elective_type]);
 		}else{
 			$status = "Added";
-			$d = $this->db->insert("tbl_subjects",["subject_name"=>$subject_name,"ideal_credits"=>$ideal_credits,"elective_status"=>$elective_status]);
+			$d = $this->db->insert("tbl_subjects",["subject_name"=>$subject_name,"ideal_credits"=>$ideal_credits,"elective_status"=>$elective_status,"elective_type"=>$elective_type]);
 		}
 		
 		if($d){

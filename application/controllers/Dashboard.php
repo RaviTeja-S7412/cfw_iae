@@ -313,15 +313,15 @@ class Dashboard extends CI_Controller {
 	public function downloadsemesterPdf($bid){
 
 		require_once(APPPATH.'libraries/mpdf/mpdf.php');
-		$mpdf = new \mPDF('UTF-8', [200,215]);
+		$mpdf = new \mPDF(['mode' => 'utf-8', 'format' => 'A4-L']);
 
 		$institution_id = $this->session->userdata('institute_id');
-		$inst = $this->db->get_where("tbl_institutes",["id"=>$institution_id])->row();
 		
 		$this->db->select("*");
 		$this->db->join("tbl_institute_branches","tbl_institute_branches.id=tbl_institute_curriculum_design.branch_id");
 		$this->db->join("tbl_courses","tbl_courses.id=tbl_institute_curriculum_design.course");
 		$data["branch_data"] = $this->db->get_where("tbl_institute_curriculum_design",["branch_id"=>$bid])->row();
+		$inst = $this->db->get_where("tbl_institutes",["id"=>$data["branch_data"]->institute_id])->row();
 
 		$semesters = [];
 
@@ -455,7 +455,7 @@ class Dashboard extends CI_Controller {
 	  </div>';
 
 	  $mpdf->WriteHTML($html);
-	  $mpdf->Output($inst->institute_name.".pdf","D");
+	  $mpdf->Output($inst->institute_name.".pdf","I");
 
 	}
 	
@@ -497,10 +497,10 @@ class Dashboard extends CI_Controller {
 		
 		$totalCredits = 0;
 		$scatcredits = [];
-		foreach(json_decode($data["branch_data"]->credits) as $sc => $tc){
+		foreach(json_decode($data["branch_data"]->credits, true) as $sc => $tc){
 			
-			$totalCredits += array_sum($tc->total_credits);
-			$scatcredits[$sc] = array_sum($tc->total_credits);
+			$totalCredits += array_sum($tc['total_credits']);
+			$scatcredits[$sc] = array_sum($tc['total_credits']);
 			
 		}
 		
@@ -593,7 +593,14 @@ class Dashboard extends CI_Controller {
 					$credits[$ssc] = $exCredits[$ssc];
 				}else{
 					if($ssc == $sub_id){
-						$credits[$ssc] = ["lecture_hours_per_week"=>$lectures,"tutorial_hours_per_week"=>$tutorial,"lab_hours_per_week"=>$lab,"total_credits"=>$total,"hours_credits"=>$hours_credits,"semesters"=>$semesters];
+						$credits[$ssc] = [
+							"lecture_hours_per_week"=>array_combine($subject_id,$lectures),
+							"tutorial_hours_per_week"=>array_combine($subject_id,$tutorial),
+							"lab_hours_per_week"=>array_combine($subject_id,$lab),
+							"total_credits"=>array_combine($subject_id,$total),
+							"hours_credits"=>array_combine($subject_id,$hours_credits),
+							"semesters"=>array_combine($subject_id,$semesters)
+						];
 					}
 				}
 			}
@@ -623,7 +630,14 @@ class Dashboard extends CI_Controller {
 				}
 				$totalCredits += array_sum($total);
 
-				$credits[$sc] = ["lecture_hours_per_week"=>$lectures,"tutorial_hours_per_week"=>$tutorial,"lab_hours_per_week"=>$lab,"total_credits"=>$total,"hours_credits"=>$hours_credits,"semesters"=>$semesters];
+				$credits[$sc] = [
+					"lecture_hours_per_week"=>array_combine($subject_id,$lectures),
+					"tutorial_hours_per_week"=>array_combine($subject_id,$tutorial),
+					"lab_hours_per_week"=>array_combine($subject_id,$lab),
+					"total_credits"=>array_combine($subject_id,$total),
+					"hours_credits"=>array_combine($subject_id,$hours_credits),
+					"semesters"=>array_combine($subject_id,$semesters)
+				];
 
 				foreach($subject_id as $ski => $si){
 					$course_codes[] = ["course_id"=>$si, "institute_id"=>$this->session->userdata("institute_id"), "course_code"=>$course_code[$ski]];
@@ -896,10 +910,10 @@ class Dashboard extends CI_Controller {
 			foreach($data as $d){
 				
 				if($d->id == $selectives[$sc]){
-					$ssub[] = ["id"=>$d->id,"subject_name"=>$d->subject_name,"selected"=>"true"];
+					$ssub[] = ["id"=>$d->id,"subject_name"=>$d->subject_name,"eStatus"=>$d->elective_status,"eType"=>$d->elective_type,"selected"=>"true"];
 				}else{
 					if(!in_array($d->id,$selectives))
-						$ssub[] = ["id"=>$d->id,"subject_name"=>$d->subject_name,"selected"=>"false"];					
+						$ssub[] = ["id"=>$d->id,"subject_name"=>$d->subject_name,"eStatus"=>$d->elective_status,"eType"=>$d->elective_type,"selected"=>"false"];					
 				}
 				
 			}
@@ -944,10 +958,10 @@ class Dashboard extends CI_Controller {
 			foreach($data as $d){
 				
 				if($d->id == $selectives[$sc]){
-					$ssub[] = ["id"=>$d->id,"subject_name"=>$d->subject_name,"selected"=>"true"];
+					$ssub[] = ["id"=>$d->id,"subject_name"=>$d->subject_name,"eStatus"=>$d->elective_status,"eType"=>$d->elective_type,"selected"=>"true"];
 				}else{
 					if(!in_array($d->id,$selectives))
-						$ssub[] = ["id"=>$d->id,"subject_name"=>$d->subject_name,"selected"=>"false"];					
+						$ssub[] = ["id"=>$d->id,"subject_name"=>$d->subject_name,"eStatus"=>$d->elective_status,"eType"=>$d->elective_type,"selected"=>"false"];					
 				}
 				
 			}
