@@ -51,18 +51,17 @@ class Dashboard extends CI_Controller {
 
 		$semesters = [];
 
-		foreach(json_decode($data["branch_data"]->credits) as $k => $s){
+		foreach(json_decode($data["branch_data"]->credits, true) as $k => $s){
 
 			$subjects = json_decode($data["branch_data"]->subjects, true)[$k];
 
-			foreach($s->semesters as $sk => $sem){
+			foreach($s['semesters'] as $sk => $sem){
 
 				$sem_name = $this->db->get_where("tbl_semesters",["id"=>$sem])->row(); 
 				$subject_category_name = $this->db->get_where("tbl_subject_category",["id"=>$k])->row()->category_name; 
-				$sub_data = $this->db->get_where("tbl_subjects",["id"=>$subjects[$sk]])->row(); 
+				$sub_data = $this->db->get_where("tbl_subjects",["id"=>$sk])->row(); 
 				
-				$semesters[] = ["subject_id"=>$subjects[$sk],"subject_category_id"=>$k,"subject_category"=>$subject_category_name,"subject_name"=>$sub_data->subject_name,
-				"ideal_credits"=>$sub_data->ideal_credits,"lecture_hours_per_week"=>$s->lecture_hours_per_week[$sk], "tutorial_hours_per_week"=>$s->tutorial_hours_per_week[$sk], "lab_hours_per_week"=>$s->lab_hours_per_week[$sk], "total_credits"=>$s->total_credits[$sk], "semester_name"=>$sem_name->semester_name, "semester_number"=>$sem_name->semester_number];
+				$semesters[] = ["subject_id"=>$sk,"subject_category_id"=>$k,"subject_category"=>$subject_category_name,"subject_name"=>$sub_data->subject_name,"ideal_credits"=>$sub_data->ideal_credits,"lecture_hours_per_week"=>$s['lecture_hours_per_week'][$sk], "tutorial_hours_per_week"=>$s['tutorial_hours_per_week'][$sk], "lab_hours_per_week"=>$s['lab_hours_per_week'][$sk], "total_credits"=>$s['total_credits'][$sk], "semester_name"=>$sem_name->semester_name, "semester_number"=>$sem_name->semester_number];
 			}
 
 		}
@@ -78,9 +77,9 @@ class Dashboard extends CI_Controller {
 
 		$totalCredits = 0;
 		
-		foreach(json_decode($data["branch_data"]->credits) as $sc => $tc){
+		foreach(json_decode($data["branch_data"]->credits, true) as $sc => $tc){
 			
-			$totalCredits += array_sum($tc->total_credits);
+			$totalCredits += array_sum($tc['total_credits']);
 			
 		}
 		
@@ -151,10 +150,10 @@ class Dashboard extends CI_Controller {
 		
 		$totalCredits = 0;
 		$scatcredits = [];
-		foreach(json_decode($data["branch_data"]->credits) as $sc => $tc){
+		foreach(json_decode($data["branch_data"]->credits, true) as $sc => $tc){
 			
-			$totalCredits += array_sum($tc->total_credits);
-			$scatcredits[$sc] = array_sum($tc->total_credits);
+			$totalCredits += array_sum($tc['total_credits']);
+			$scatcredits[$sc] = array_sum($tc['total_credits']);
 			
 		}
 		
@@ -208,10 +207,10 @@ class Dashboard extends CI_Controller {
 		
 		$totalCredits = 0;
 		$scatcredits = [];
-		foreach(json_decode($data["branch_data"]->credits) as $sc => $tc){
+		foreach(json_decode($data["branch_data"]->credits, true) as $sc => $tc){
 			
-			$totalCredits += array_sum($tc->total_credits);
-			$scatcredits[$sc] = array_sum($tc->total_credits);
+			$totalCredits += array_sum($tc['total_credits']);
+			$scatcredits[$sc] = array_sum($tc['total_credits']);
 			
 		}
 		
@@ -268,21 +267,21 @@ class Dashboard extends CI_Controller {
 						$sdata = $this->db->get_where("tbl_subjects",["id"=>$sub])->row();
 						$cdata = $this->db->get_where("tbl_course_codes",["course_id"=>$sub,"institute_id"=>$this->session->userdata("institute_id")])->row();
 
-						$creditsData = json_decode($data["branch_data"]->credits)->$sc;
-						array_push($lecture_hours_per_week, $creditsData->lecture_hours_per_week[$sk]);
-						array_push($tutorial_hours_per_week, $creditsData->tutorial_hours_per_week[$sk]);
-						array_push($lab_hours_per_week, $creditsData->lab_hours_per_week[$sk]);
-						array_push($total_credits, $creditsData->total_credits[$sk]);
+						$creditsData = json_decode($data["branch_data"]->credits, true)[$sc];
+						array_push($lecture_hours_per_week, $creditsData['lecture_hours_per_week'][$sub]);
+						array_push($tutorial_hours_per_week, $creditsData['tutorial_hours_per_week'][$sub]);
+						array_push($lab_hours_per_week, $creditsData['lab_hours_per_week'][$sub]);
+						array_push($total_credits, $creditsData['total_credits'][$sub]);
 				  
 						$html .= '<tr  style="border:1px solid gray;">
 						  <td scope="row" style="text-align: left; border:1px solid gray;">'.($sk+1).'</td>
 						  <td scope="row" style="text-align: left; border:1px solid gray;">'.$sdata->subject_name.'</td>
 						  <td scope="row" style="text-align: left; border:1px solid gray;">'.$cdata->course_code.'</td>
-						  <td style="border:1px solid gray;text-align: center;">'.$creditsData->lecture_hours_per_week[$sk].'</td>
-						  <td style="border:1px solid gray;text-align: center;">'.$creditsData->tutorial_hours_per_week[$sk].'</td>
-						  <td style="border:1px solid gray;text-align: center;">'.$creditsData->lab_hours_per_week[$sk].'</td>
-						  <td style="border:1px solid gray;text-align: center;">'.$creditsData->total_credits[$sk].'</td>
-						  <td style="border:1px solid gray;text-align: center;">'.$this->db->get_where("tbl_semesters",["id"=>$creditsData->semesters[$sk]])->row()->semester_name.'</td>
+						  <td style="border:1px solid gray;text-align: center;">'.$creditsData['lecture_hours_per_week'][$sub].'</td>
+						  <td style="border:1px solid gray;text-align: center;">'.$creditsData['tutorial_hours_per_week'][$sub].'</td>
+						  <td style="border:1px solid gray;text-align: center;">'.$creditsData['lab_hours_per_week'][$sub].'</td>
+						  <td style="border:1px solid gray;text-align: center;">'.$creditsData['total_credits'][$sub].'</td>
+						  <td style="border:1px solid gray;text-align: center;">'.$this->db->get_where("tbl_semesters",["id"=>$creditsData['semesters'][$sub]])->row()->semester_name.'</td>
 						</tr>';
 				   	}
 					$html .= '<tr>
@@ -325,18 +324,17 @@ class Dashboard extends CI_Controller {
 
 		$semesters = [];
 
-		foreach(json_decode($data["branch_data"]->credits) as $k => $s){
+		foreach(json_decode($data["branch_data"]->credits, true) as $k => $s){
 
 			$subjects = json_decode($data["branch_data"]->subjects, true)[$k];
 
-			foreach($s->semesters as $sk => $sem){
+			foreach($s['semesters'] as $sk => $sem){
 
 				$sem_name = $this->db->get_where("tbl_semesters",["id"=>$sem])->row(); 
 				$subject_category_name = $this->db->get_where("tbl_subject_category",["id"=>$k])->row()->category_name; 
-				$sub_data = $this->db->get_where("tbl_subjects",["id"=>$subjects[$sk]])->row(); 
+				$sub_data = $this->db->get_where("tbl_subjects",["id"=>$sk])->row(); 
 				
-				$semesters[] = ["subject_category"=>$subject_category_name,"subject_category_id"=>$k,"subject_name"=>$sub_data->subject_name,
-				"ideal_credits"=>$sub_data->ideal_credits,"lecture_hours_per_week"=>$s->lecture_hours_per_week[$sk], "tutorial_hours_per_week"=>$s->tutorial_hours_per_week[$sk], "lab_hours_per_week"=>$s->lab_hours_per_week[$sk], "total_credits"=>$s->total_credits[$sk], "semester_name"=>$sem_name->semester_name,"semester_number" => $sem_name->semester_number ,"subject_id"=>$sub_data->id];
+				$semesters[] = ["subject_category"=>$subject_category_name,"subject_category_id"=>$k,"subject_name"=>$sub_data->subject_name,"ideal_credits"=>$sub_data->ideal_credits,"lecture_hours_per_week"=>$s['lecture_hours_per_week'][$sk], "tutorial_hours_per_week"=>$s['tutorial_hours_per_week'][$sk], "lab_hours_per_week"=>$s['lab_hours_per_week'][$sk], "total_credits"=>$s['total_credits'][$sk], "semester_name"=>$sem_name->semester_name,"semester_number" => $sem_name->semester_number ,"subject_id"=>$sub_data->id];
 			}
 
 		}
@@ -352,9 +350,9 @@ class Dashboard extends CI_Controller {
 
 		$totalCredits = 0;
 		
-		foreach(json_decode($data["branch_data"]->credits) as $sc => $tc){
+		foreach(json_decode($data["branch_data"]->credits, true) as $sc => $tc){
 			
-			$totalCredits += array_sum($tc->total_credits);
+			$totalCredits += array_sum($tc['total_credits']);
 			
 		}
 		
@@ -455,7 +453,7 @@ class Dashboard extends CI_Controller {
 	  </div>';
 
 	  $mpdf->WriteHTML($html);
-	  $mpdf->Output($inst->institute_name.".pdf","I");
+	  $mpdf->Output($inst->institute_name.".pdf","D");
 
 	}
 	

@@ -92,22 +92,22 @@
 						$sdata = $this->db->get_where("tbl_subjects",["id"=>$sub])->row();
 						$cdata = $this->db->get_where("tbl_course_codes",["course_id"=>$sub,"institute_id"=>$this->session->userdata("institute_id")])->row();
 
-						$creditsData = json_decode($branch_data->credits)->$sc;
+						$creditsData = json_decode($branch_data->credits,true)[$sc];
 
 						array_push($ideal_credits, $sdata->ideal_credits);
-						array_push($lecture_hours_per_week, $creditsData->lecture_hours_per_week[$sk]);
-						array_push($tutorial_hours_per_week, $creditsData->tutorial_hours_per_week[$sk]);
-						array_push($lab_hours_per_week, $creditsData->lab_hours_per_week[$sk]);
-						array_push($total_credits, $creditsData->total_credits[$sk]);
+						array_push($lecture_hours_per_week, $creditsData['lecture_hours_per_week'][$sub]);
+						array_push($tutorial_hours_per_week, $creditsData['tutorial_hours_per_week'][$sub]);
+						array_push($lab_hours_per_week, $creditsData['lab_hours_per_week'][$sub]);
+						array_push($total_credits, $creditsData['total_credits'][$sub]);
 				?>
 					  <tr>
 						<td scope="row" style="text-align: left"><? echo $sdata->subject_name; ?></td>
 						<td scope="row" style="text-align: left"><? echo $cdata->course_code; ?></td>
 						<td><? echo $sdata->ideal_credits ?></td>
-						<td><? echo $creditsData->lecture_hours_per_week[$sk] ?></td>
-						<td><? echo $creditsData->tutorial_hours_per_week[$sk] ?></td>
-						<td><? echo $creditsData->lab_hours_per_week[$sk] ?></td>
-						<td><? echo $creditsData->total_credits[$sk] ?></td>
+						<td><? echo $creditsData['lecture_hours_per_week'][$sub] ?></td>
+						<td><? echo $creditsData['tutorial_hours_per_week'][$sub] ?></td>
+						<td><? echo $creditsData['lab_hours_per_week'][$sub] ?></td>
+						<td><? echo $creditsData['total_credits'][$sub] ?></td>
 						<td><? echo $this->db->get_where("tbl_semesters",["id"=>$creditsData->semesters[$sk]])->row()->semester_name; ?></td>
 					  </tr>
 				<? } ?>

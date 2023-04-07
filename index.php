@@ -61,7 +61,7 @@ header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token, Author
 
 /*
  *---------------------------------------------------------------
- * ERROR REPORTING
+ * ERROR REPORTING 	
  *---------------------------------------------------------------
  *
  * Different environments will require different levels of error reporting.
